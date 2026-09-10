@@ -169,6 +169,16 @@ class QuestEntity{
     }
     
     public collidesWith(questEntity: QuestEntity, pos: Pos = new Pos(0, 0)): boolean{
+        // Entities on the player's own team (the player, its clones, and anything it summons --
+        // e.g. an Octopus King crown, a tribe warrior) never physically block one another. Without
+        // this, a summoned ally that's pathing towards the player (see PlayerSummonedOctopusKing's
+        // update()) can end up standing directly in a narrow corridor and wedge the player in place,
+        // since collision checks otherwise don't care whether two entities are allies. They still
+        // collide normally with everything else (walls, enemies), so combat and level geometry are
+        // unaffected -- this only stops your own side from jamming itself.
+        if(this.team == QuestEntityTeam.PLAYER && questEntity.getTeam() == QuestEntityTeam.PLAYER)
+            return false;
+        
         // If we both have a collision box collection, we return the result of the collision test
         if(this.cbc != null && questEntity.getCbc() != null)
            return this.cbc.collidesWith(questEntity.getCbc(), pos);

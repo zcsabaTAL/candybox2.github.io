@@ -1,97 +1,182 @@
-/* Body */
+/* Dark Theme Redesign for Candy Box 2 */
 
+/* Body */
 body{
-    margin: 0; /* No margin ! */
-    overflow-y: scroll; /* In order to always show the vertical scrolling bar */
+    margin: 0;
+    overflow-y: scroll;
     text-align: center;
+    background: radial-gradient(circle at 50% 10%, #16111a, #050508);
+    background-attachment: fixed;
+    color: #e0e0e0;
+    min-height: 100vh;
 }
 
 #aroundStatusBar{
-    z-index: 100; /* With this z-index, the status bar will be displayed over the main content (useful when showing the map) */
+    z-index: 100;
+    background: rgba(10, 10, 15, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 10px 0;
 }
 
 #statusBar{
-    /* Other stuff */
-    margin-top: 0; /* This one is to make sure the status bar sticks to the top of the page */
-    margin-bottom: 0; /* To avoid having a gap between the status bar and the main content */
+    margin-top: 0;
+    margin-bottom: 0;
     display: inline-block;
-    background-color: rgb(255, 255, 255); /* White background */
-    margin: 0 auto; /* Centering */
+    background-color: transparent;
+    margin: 0 auto;
+    /* This is a fixed-column ASCII grid (tabs, separators, health bar) -- it MUST stay monospace,
+       with no letter-spacing, or every column misaligns and the text visually "falls apart". */
+    font-family: 'Courier New', Courier, monospace;
+    color: #fff;
 }
 
 #mainContent{
-    margin-top: 0; /* To avoid having a gap between the main content and the div around it */
-    margin-bottom: 0;
-    display: inline-block; /* Centering */
-    margin: 0 auto; /* Centering */
+    margin-top: 30px;
+    margin-bottom: 50px;
+    display: inline-block;
+    margin: 0 auto;
 }
 
 #versionNumber{
     position: fixed;
-    bottom: 0px;
+    bottom: 10px;
     left: 10px;
-    font-size: 10px;
+    font-size: 11px;
+    font-family: 'Montserrat', sans-serif;
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 0.5px;
+}
+
+#versionNumber a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+#versionNumber a:hover {
+    color: #ff0055;
+    text-shadow: 0 0 5px rgba(255,0,85,0.8);
 }
 
 /* Pre tag */
-
 pre{
-    font-family: monospace; /* The pre tag will use the generic "monospace" font family, which should be the default anyway */
+    font-family: 'Courier New', Courier, monospace;
     font-size: 1em;
+    line-height: 1.2;
 }
 
 /* asciiButton class, used for buttons inside ascii art */
-
 .asciiButton{
-    cursor: pointer; /* To change the pointer when we pass the mouse on the link */
+    cursor: pointer;
     user-select: none;
+    transition: color 0.3s;
+}
+
+.asciiButton:hover,
+.asciiButton.asciiGroupHover {
+    color: #00e5ff !important;
+    text-shadow: 0 0 8px rgba(0, 229, 255, 0.6);
+}
+
+/* ------------------------------------------------------------
+   Per-place / per-object-type hover colors, layered on top of the
+   generic cyan default above. Scoped selectors (body[data-place=...])
+   carry higher specificity than the plain .asciiButton.asciiGroupHover
+   rule above, so these win over it wherever they apply -- no source
+   order dependency.
+   ------------------------------------------------------------ */
+
+/* Village: its own paler, softer blue instead of the saturated default cyan. */
+body[data-place="Village"] .asciiButton:hover,
+body[data-place="Village"] .asciiButton.asciiGroupHover {
+    color: #8fd4f0 !important;
+    text-shadow: 0 0 8px rgba(143, 212, 240, 0.45);
+}
+
+/* Map: general hover matches the amber theme already used for its corner ornaments,
+   background and ambient embers -- everything except the two overrides below. */
+body[data-place="MainMap"] .asciiButton:hover,
+body[data-place="MainMap"] .asciiButton.asciiGroupHover {
+    color: #f0c88c !important;
+    text-shadow: 0 0 8px rgba(224, 164, 88, 0.5);
+}
+
+/* The Desert glows yellow on hover, standing out from the Map's amber default.
+   Note on specificity: body[data-place="MainMap"] .asciiButton.asciiGroupHover above is
+   (0,3,1) -- a plain .mapTheDesertButton.asciiGroupHover would only be (0,2,0) and would
+   NOT reliably beat it, regardless of source order. So this stays place-scoped the same
+   way (equal specificity, wins on source order since it's declared after). */
+body[data-place="MainMap"] .mapTheDesertButton:hover,
+body[data-place="MainMap"] .mapTheDesertButton.asciiGroupHover {
+    color: #f5d76e !important;
+    text-shadow: 0 0 8px rgba(245, 215, 110, 0.6);
+}
+
+/* Trees (the standalone tree landmark and the forest) glow green on hover. Only the Map
+   draws trees today, so this is place-scoped like the Desert rule above (same specificity
+   reasoning); add another body[data-place="..."] block here if a future screen draws
+   trees too. */
+body[data-place="MainMap"] .mapATreeButton:hover,
+body[data-place="MainMap"] .mapATreeButton.asciiGroupHover,
+body[data-place="MainMap"] .mapForestButton:hover,
+body[data-place="MainMap"] .mapForestButton.asciiGroupHover {
+    color: #5fd68a !important;
+    text-shadow: 0 0 8px rgba(95, 214, 138, 0.55);
 }
 
 /* asciiNinjaButton class, used for buttons hidden inside ascii art */
-
 .asciiNinjaButton{
     user-select: none;
 }
 
 /* aroundRealButton class, used by the span tag around real buttons */
-
 .aroundRealButton{
     user-select: none;
 }
 
 /* asciiRealButton class, used for buttons inside ascii art with borders and stuff */
-
 .asciiRealButton{
-    cursor: pointer; /* To change the pointer when we pass the mouse on the button */
-
-    /* The border itself */
-    border-width: 1px;
-    border-style: solid;
-    border-color: #464c54;
-    
-    /* Grey background color */
-    background-color: #dcdad5;
-    
-    /* Position absolute inside the aroundRealButton span */
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(20, 15, 25, 0.6);
+    backdrop-filter: blur(5px);
+    color: #fff;
     position: absolute;
     user-select: none;
+    transition: all 0.3s ease;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 6px 16px;
+    border-radius: 2px;
 }
 
 .asciiRealButton:hover{
-    background-color: #eeebe7; /* New background color, lighter grey */
-    border-width: 1px;
+    background: rgba(40, 20, 35, 0.8);
+    border-color: #ff0055;
+    box-shadow: 0 0 15px rgba(255, 0, 85, 0.4), inset 0 0 10px rgba(255, 0, 85, 0.2);
+    color: #fff;
 }
 
 /* Comments */
-
 .aroundComment{
-    display: none; /* The comment must be hidden by default ! */
-    cursor: pointer; /* To change the pointer when we pass the mouse on the comment */
+    display: none;
+    cursor: pointer;
 }
 
 .comment{
-    position: absolute; /* The comment itself has an absolute position relatively to the aroundComment span */
-    background-color: rgba(255, 255, 255, 0.9);
+    position: absolute;
+    background: rgba(20, 20, 25, 0.95);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #fff;
+    padding: 8px;
+    border-radius: 4px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
 }
 
 .englishComment{
@@ -100,72 +185,755 @@ pre{
 
 .translated{
     font-style: italic;
+    color: #aaa;
 }
 
 /* Select */
-
 .aroundSelect{
-   
 }
 
 .asciiSelect{
-    font-family: monospace;
+    font-family: 'Courier New', monospace;
     position: absolute;
+    background: rgba(20,20,25,0.8);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #00e5ff;
 }
 
 .asciiSelectOption{
-     
 }
 
 /* Text input */
-
 .aroundTextInput{
-    
 }
 
 .asciiTextInput{
-    font-family: monospace;
+    font-family: 'Courier New', monospace;
     position: absolute;
+    background: rgba(20,20,25,0.8);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #00e5ff;
 }
 
 /* Enigma */
-
 .enigmaWrongMessage{
     visibility: hidden;
+    color: #ff0055;
 }
 
 /* Tooltips */
-
 .tooltip{
     text-decoration: none;
     display: none;
-    white-space: normal; /* To force breaklines in tooltips */
+    white-space: normal;
     text-align: left;
     font-style: normal;
     position: fixed;
-    padding: 5px;
+    padding: 10px 15px;
     margin: 5px;
-    border: 1px solid;
-    font-family: monospace;
+    border: 1px solid rgba(0, 229, 255, 0.3);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
     width: 200px;
-    background-color: rgb(255, 255, 255);
-    border-color: rgb(0, 0, 0);
-    z-index: 99999; /* The tooltip must be above everything */
+    background: rgba(10, 10, 15, 0.95);
+    color: #fff;
+    box-shadow: 0 5px 20px rgba(0, 229, 255, 0.2);
+    z-index: 99999;
+    border-radius: 4px;
+    backdrop-filter: blur(5px);
 }
 
 /* Checkboxes */
-
 .aroundCheckbox{
     position: absolute;
 }
 
 .asciiCheckbox{
-    
 }
 
 /* Textareas */
-
 .textarea{
-    resize: none; /* We must not be able to resize textareas because it would cause many bugs linked to how we handle ascii render areas.. */
+    resize: none;
     position: absolute;
+    background: rgba(20,20,25,0.8);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
 }
+/* UI Redesign Extensions */
+#topBar {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 20px 40px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(3, 3, 5, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.stat-box {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding-right: 40px;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    margin-right: 40px;
+}
+
+.stat-box:last-child {
+    border-right: none;
+}
+
+.stat-icon {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.candy-icon {
+    border: 2px solid #ff0055;
+    background: rgba(255,0,85,0.1);
+    transform: rotate(45deg);
+    box-shadow: 0 0 10px rgba(255,0,85,0.5), inset 0 0 5px rgba(255,0,85,0.3);
+}
+.candy-icon::after {
+    content: '';
+    width: 10px;
+    height: 10px;
+    background: #ff0055;
+}
+
+.lollipop-icon {
+    border: 2px solid #00e5ff;
+    background: rgba(0,229,255,0.1);
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(0,229,255,0.5), inset 0 0 5px rgba(0,229,255,0.3);
+}
+.lollipop-icon::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border: 1px solid #00e5ff;
+    border-radius: 50%;
+}
+
+.chocolate-icon {
+    border: 2px solid #c17f3e;
+    background: rgba(193,127,62,0.12);
+    border-radius: 3px;
+    box-shadow: 0 0 10px rgba(193,127,62,0.5), inset 0 0 5px rgba(193,127,62,0.3);
+}
+.chocolate-icon::after {
+    content: '';
+    width: 5px;
+    height: 5px;
+    background: #c17f3e;
+    box-shadow:
+        7px 0 0 #c17f3e,
+        0 7px 0 #c17f3e,
+        7px 7px 0 #c17f3e;
+}
+
+.pain-icon {
+    border: 2px solid #e0a458;
+    background: rgba(224,164,88,0.15);
+    border-radius: 50% 50% 20% 20%;
+    box-shadow: 0 0 10px rgba(224,164,88,0.5), inset 0 0 5px rgba(224,164,88,0.3);
+}
+.pain-icon::after {
+    content: '';
+    width: 10px;
+    height: 6px;
+    background: #e0a458;
+    border-radius: 2px;
+}
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.stat-label {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: #a09fa5;
+    margin-bottom: 4px;
+}
+
+.stat-value {
+    font-family: 'Cinzel', serif;
+    font-size: 24px;
+    font-weight: bold;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.candy-stat .stat-value { color: #e6c587; }
+.lollipop-stat .stat-value { color: #fff; }
+.chocolate-stat .stat-value { color: #d99a5b; }
+.pain-stat .stat-value { color: #f0c27b; }
+
+.stat-rate {
+    font-size: 12px;
+    color: #ff0055;
+    font-family: monospace;
+}
+
+/* The original ASCII status bar (nav tabs + health bar) is now fully replaced by the
+   modern .game-nav / .health-bar-container below. Its DOM (and click handlers) stay in
+   place -- unused -- so we just hide it visually rather than touching the render pipeline. */
+#aroundStatusBar {
+    display: none;
+}
+
+/* Modern navigation tabs */
+.game-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 25px 0;
+}
+
+.nav-tab {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: #a09fa5;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.nav-tab:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.nav-tab.active {
+    color: #fff;
+    background: rgba(255, 0, 85, 0.15);
+    border-color: #ff0055;
+    box-shadow: 0 0 12px rgba(255, 0, 85, 0.5), inset 0 0 8px rgba(255, 0, 85, 0.2);
+}
+
+/* Modern health bar */
+.health-bar-container {
+    margin: 0 0 25px 0;
+}
+
+.health-bar-track {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    height: 26px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+}
+
+.health-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff0055, #38d66b);
+    box-shadow: 0 0 10px rgba(56, 214, 107, 0.5);
+    transition: width 0.4s ease;
+}
+
+.health-bar-text {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+}
+
+#game-layout {
+    display: flex;
+    padding: 60px;
+    gap: 60px;
+    text-align: left;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+#left-panel {
+    flex: 1;
+}
+
+#right-panel {
+    flex: 1;
+}
+
+.breadcrumb {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: #a09fa5;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+}
+
+/* Same breadcrumb, but living inside #topBar, left of the stat boxes, larger than its original size */
+.header-breadcrumb {
+    margin-bottom: 0;
+    margin-right: 40px;
+    padding-right: 40px;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 16px;
+    letter-spacing: 2px;
+    white-space: nowrap;
+}
+
+.breadcrumb .highlight {
+    color: #ff0055;
+}
+
+.main-title {
+    font-family: 'Cinzel', serif;
+    font-size: 42px;
+    line-height: 1.2;
+    margin: 0 0 40px 0;
+    color: #fff;
+    text-shadow: 0 0 20px rgba(255,255,255,0.2);
+    letter-spacing: 2px;
+}
+
+/* Italic flavor-quote line under the place title. Populated by UIBridge.ts (empty/hidden
+   by default -- only the Village pilot sets one for now). Pulled up under the title with a
+   negative top margin so it reads as part of the same header block rather than a separate
+   paragraph. */
+.place-flavor-quote {
+    display: none;
+    font-family: 'Cinzel', serif;
+    font-style: italic;
+    font-size: 15px;
+    line-height: 1.5;
+    color: rgba(160, 159, 165, 0.85);
+    margin: -28px 0 40px 0;
+    max-width: 480px;
+}
+
+/* Village keeps the cool-toned glow to match its reskin; every other place that grows a
+   flavor line (CandyBox, LollipopFarm) uses the neutral warm-gray tone above instead. */
+body[data-place="Village"] .place-flavor-quote {
+    color: rgba(191, 233, 255, 0.7);
+    text-shadow: 0 0 6px rgba(120, 210, 255, 0.25);
+}
+
+/* Hide original top bar ASCII stuff from original-game-container */
+/* We will intercept and hide the ASCII "THE CANDY BOX" and stats */
+#original-game-container pre {
+    text-align: left;
+}
+
+/* The vanilla engine (RenderLocation.initScrolling, for wide/scrolling screens like the Map)
+   sets #mainContent to position:absolute; top:0; left:0. That used to land correctly because
+   #aroundStatusBar (now hidden) occupied the space above it in flow. With no positioned
+   ancestor, an absolutely positioned #mainContent falls back to the viewport as its containing
+   block -- so it was rendering from the very top of the page, overlapping (and, being on top of
+   the stacking order, intercepting clicks on) the new header/nav/health bar. Giving this
+   container `position: relative` makes it the containing block instead, so #mainContent's
+   top:0/left:0 resolves to the top-left of THIS box (right below the new nav/health bar, where
+   it belongs) rather than the top of the viewport. */
+#original-game-container {
+    position: relative;
+}
+
+/* NOTE: #aroundStatusBar (the raw ASCII tabs/health bar) is hidden once, earlier in this file,
+   right above .game-nav / .health-bar-container which fully replace it. Do NOT re-declare
+   #aroundStatusBar here -- an earlier "display: block" override here used to fight that rule
+   (same specificity, later in the cascade = wins) and made the old ASCII grid reappear on top
+   of the new header. */
+
+
+/* Dev Mode Button */
+#dev-mode-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(20, 20, 25, 0.8);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+    letter-spacing: 1px;
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+#dev-mode-btn:hover {
+    background: rgba(255, 0, 85, 0.2);
+    border-color: #ff0055;
+    box-shadow: 0 0 10px rgba(255, 0, 85, 0.5);
+}
+
+.dev-mode-active #dev-mode-btn {
+    background: rgba(255, 0, 85, 0.4);
+    border-color: #ff0055;
+    color: #fff;
+    text-shadow: 0 0 5px #fff;
+    box-shadow: 0 0 15px rgba(255, 0, 85, 0.8);
+}
+
+/* ============================================================
+   Village pilot: cool-toned ascii reskin + floating glow marker
+   Scoped to body[data-place="Village"] (set by UIBridge) so it
+   doesn't touch any other screen while this is being piloted.
+   ============================================================ */
+
+body[data-place="Village"] #left-panel {
+    position: relative;
+    /* Layered atmosphere: soft glow behind the title, a very faint diagonal mist texture
+       for depth, and a vignette that darkens the panel's own edges -- three gradients
+       stacked instead of the single flat glow the pilot shipped with. */
+    background:
+        radial-gradient(ellipse 60% 50% at 50% 32%, rgba(90, 180, 230, 0.14) 0%, rgba(90, 180, 230, 0) 70%),
+        repeating-linear-gradient(115deg, rgba(120, 210, 255, 0.03) 0px, rgba(120, 210, 255, 0.03) 1px, rgba(120, 210, 255, 0) 1px, rgba(120, 210, 255, 0) 34px),
+        radial-gradient(ellipse 90% 90% at 50% 50%, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.35) 100%);
+    /* Room for the corner ornaments below so they don't crowd the title/nav content. */
+    padding-top: 8px;
+}
+
+/* Engraved corner brackets, evoking the reference mockups' framed-panel look without any
+   image asset -- a single inline SVG (fine hairline bracket + gem + small crossmark),
+   mirrored via rotation for the opposite corner. Purely decorative: pointer-events none,
+   sits above the background but below all real content. */
+body[data-place="Village"] #left-panel::before,
+body[data-place="Village"] #left-panel::after {
+    content: '';
+    position: absolute;
+    width: 72px;
+    height: 72px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cpath d='M4 45 L4 4 L45 4' stroke='%235ab4e6' stroke-width='1.5' fill='none' opacity='0.55'/%3E%3Cpath d='M4 65 L4 100' stroke='%235ab4e6' stroke-width='1' fill='none' opacity='0.28'/%3E%3Cpath d='M65 4 L100 4' stroke='%235ab4e6' stroke-width='1' fill='none' opacity='0.28'/%3E%3Ccircle cx='4' cy='4' r='3' fill='%235ab4e6' opacity='0.65'/%3E%3Cpath d='M16 16 L26 26 M26 16 L16 26' stroke='%235ab4e6' stroke-width='1' opacity='0.4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    pointer-events: none;
+    z-index: 0;
+}
+
+body[data-place="Village"] #left-panel::before {
+    top: 0;
+    left: 0;
+}
+
+body[data-place="Village"] #left-panel::after {
+    bottom: 0;
+    right: 0;
+    transform: rotate(180deg);
+}
+
+/* Everything real inside the panel needs to sit above the corner ornaments (z-index: 0). */
+body[data-place="Village"] #left-panel > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* Thin gradient rule under the title, standing in for a hand-drawn divider without a new
+   DOM element -- fades out both ends so it doesn't read as a hard line. */
+body[data-place="Village"] .main-title {
+    padding-bottom: 18px;
+    border-bottom: none;
+    background-image: linear-gradient(90deg, rgba(120, 210, 255, 0) 0%, rgba(120, 210, 255, 0.45) 18%, rgba(120, 210, 255, 0.45) 55%, rgba(120, 210, 255, 0) 100%);
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 100% 1px;
+}
+
+body[data-place="Village"] #mainContent {
+    color: #bfe9ff;
+    text-shadow: 0 0 6px rgba(120, 210, 255, 0.35);
+}
+
+/* Floating glow-dot companion to the group hover highlight (see AsciiGroupHover /
+   AsciiPoiMarker). Fixed-positioned and centered on whatever element(s) are
+   currently highlighted; hidden (opacity 0) the rest of the time. */
+.ascii-poi-marker {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 16px;
+    height: 16px;
+    margin-left: -8px;
+    margin-top: -8px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0, 229, 255, 0.9) 0%, rgba(0, 229, 255, 0.45) 45%, rgba(0, 229, 255, 0) 72%);
+    box-shadow: 0 0 12px 4px rgba(0, 229, 255, 0.5);
+    pointer-events: none;
+    opacity: 0;
+    transform: scale(0.6);
+    transition: opacity 0.25s ease, transform 0.25s ease, left 0.15s ease, top 0.15s ease;
+    z-index: 500;
+}
+
+.ascii-poi-marker-active {
+    opacity: 1;
+    transform: scale(1);
+    animation: asciiPoiPulse 2.4s ease-in-out infinite;
+}
+
+@keyframes asciiPoiPulse {
+    0%, 100% { box-shadow: 0 0 12px 4px rgba(0, 229, 255, 0.5); }
+    50% { box-shadow: 0 0 22px 8px rgba(0, 229, 255, 0.85); }
+}
+
+/* Ambient floating embers, shared by every reskinned place -- a handful of small glowing
+   motes that drift slowly upward and fade in/out, for a bit of life in the background.
+   The container is always in the DOM (created once by PlaceAmbience.ts) but only visible
+   on places that opted in below; elsewhere it's fully hidden and does nothing. Color is
+   place-scoped (cyan on Village, amber on the Map) so each screen keeps its own palette. */
+#place-ambience {
+    display: none;
+}
+
+body[data-place="Village"] #place-ambience,
+body[data-place="MainMap"] #place-ambience {
+    display: block;
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.place-ember {
+    position: absolute;
+    bottom: -10px;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: rgba(150, 220, 255, 0.8);
+    box-shadow: 0 0 6px 2px rgba(120, 210, 255, 0.55);
+    animation-name: placeEmberDrift;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+}
+
+body[data-place="MainMap"] .place-ember {
+    background: rgba(240, 200, 140, 0.85);
+    box-shadow: 0 0 6px 2px rgba(224, 164, 88, 0.55);
+}
+
+@keyframes placeEmberDrift {
+    0%   { transform: translate(0, 0); opacity: 0; }
+    10%  { opacity: 0.85; }
+    50%  { transform: translate(var(--ember-drift, 12px), -50vh); opacity: 0.6; }
+    90%  { opacity: 0; }
+    100% { transform: translate(0, -100vh); opacity: 0; }
+}
+
+/* Respect reduced-motion preferences -- the embers pause rather than force movement. */
+@media (prefers-reduced-motion: reduce) {
+    .place-ember {
+        animation: none;
+        opacity: 0.4;
+    }
+}
+
+/* ============================================================
+   Map pilot: warm/amber ascii reskin, same visual language as the
+   Village (corner ornaments, layered background, title divider,
+   ambient particles) but in the World Map's own palette.
+   Scoped to body[data-place="MainMap"] so it doesn't touch any
+   other screen.
+   ============================================================ */
+
+body[data-place="MainMap"] #left-panel {
+    position: relative;
+    background:
+        radial-gradient(ellipse 60% 50% at 50% 32%, rgba(224, 164, 88, 0.14) 0%, rgba(224, 164, 88, 0) 70%),
+        repeating-linear-gradient(115deg, rgba(224, 164, 88, 0.03) 0px, rgba(224, 164, 88, 0.03) 1px, rgba(224, 164, 88, 0) 1px, rgba(224, 164, 88, 0) 34px),
+        radial-gradient(ellipse 90% 90% at 50% 50%, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.35) 100%);
+    padding-top: 8px;
+}
+
+body[data-place="MainMap"] #left-panel::before,
+body[data-place="MainMap"] #left-panel::after {
+    content: '';
+    position: absolute;
+    width: 72px;
+    height: 72px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cpath d='M4 45 L4 4 L45 4' stroke='%23e0a458' stroke-width='1.5' fill='none' opacity='0.55'/%3E%3Cpath d='M4 65 L4 100' stroke='%23e0a458' stroke-width='1' fill='none' opacity='0.28'/%3E%3Cpath d='M65 4 L100 4' stroke='%23e0a458' stroke-width='1' fill='none' opacity='0.28'/%3E%3Ccircle cx='4' cy='4' r='3' fill='%23e0a458' opacity='0.65'/%3E%3Cpath d='M16 16 L26 26 M26 16 L16 26' stroke='%23e0a458' stroke-width='1' opacity='0.4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    pointer-events: none;
+    z-index: 0;
+}
+
+body[data-place="MainMap"] #left-panel::before {
+    top: 0;
+    left: 0;
+}
+
+body[data-place="MainMap"] #left-panel::after {
+    bottom: 0;
+    right: 0;
+    transform: rotate(180deg);
+}
+
+body[data-place="MainMap"] #left-panel > * {
+    position: relative;
+    z-index: 1;
+}
+
+body[data-place="MainMap"] .main-title {
+    padding-bottom: 18px;
+    background-image: linear-gradient(90deg, rgba(224, 164, 88, 0) 0%, rgba(224, 164, 88, 0.5) 18%, rgba(224, 164, 88, 0.5) 55%, rgba(224, 164, 88, 0) 100%);
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 100% 1px;
+}
+
+body[data-place="MainMap"] #mainContent {
+    color: #f0dfc0;
+    text-shadow: 0 0 6px rgba(224, 164, 88, 0.3);
+}
+
+body[data-place="MainMap"] .place-flavor-quote {
+    color: rgba(224, 189, 140, 0.8);
+    text-shadow: 0 0 6px rgba(224, 164, 88, 0.25);
+}
+
+/* The hover glow-marker keeps the same cyan on Village but switches to amber on the Map,
+   to match each screen's own palette (the underlying hover mechanism -- AsciiGroupHover /
+   AsciiPoiMarker -- is completely shared and unaware of color). */
+body[data-place="MainMap"] .ascii-poi-marker {
+    background: radial-gradient(circle, rgba(240, 200, 140, 0.95) 0%, rgba(224, 164, 88, 0.5) 45%, rgba(224, 164, 88, 0) 72%);
+    box-shadow: 0 0 12px 4px rgba(224, 164, 88, 0.55);
+}
+
+body[data-place="MainMap"] .ascii-poi-marker-active {
+    animation: asciiPoiPulseAmber 2.4s ease-in-out infinite;
+}
+
+@keyframes asciiPoiPulseAmber {
+    0%, 100% { box-shadow: 0 0 12px 4px rgba(224, 164, 88, 0.55); }
+    50% { box-shadow: 0 0 22px 8px rgba(224, 164, 88, 0.85); }
+}
+
+/* ------------------------------------------------------------
+   Quest battle log ("quest-log-line" / "quest-log-line-count" /
+   "quest-log-delimiter" -- see QuestLogMessage.ts and QuestLog.ts).
+   The log itself is still drawn character-by-character into the ascii
+   grid (unchanged, to avoid touching any positioning/layout math);
+   these classes only retype and recolor it, so no gameplay behavior
+   changes. Swaps the raw Courier-New terminal look for a quieter,
+   more deliberate "field journal" feel: a refined monospace, gentle
+   letter-spacing, a dimmer body tone with the trailing "(found so
+   far)" counts picked out in a warmer accent, and the two delimiter
+   rows turned from literal dashes into a soft gradient hairline.
+   ------------------------------------------------------------ */
+.quest-log-line {
+    font-family: 'JetBrains Mono', 'Courier New', Courier, monospace;
+    font-size: 13px;
+    letter-spacing: 0.01em;
+    line-height: 1.7;
+    color: rgba(210, 205, 198, 0.82);
+}
+
+.quest-log-line-count {
+    color: rgba(224, 189, 140, 0.95);
+    font-weight: 500;
+}
+
+.quest-log-delimiter {
+    color: transparent;
+    display: inline-block;
+    height: 1px;
+    vertical-align: middle;
+    background-image: linear-gradient(90deg, rgba(180, 175, 168, 0) 0%, rgba(180, 175, 168, 0.35) 15%, rgba(180, 175, 168, 0.35) 85%, rgba(180, 175, 168, 0) 100%);
+    background-repeat: no-repeat;
+    background-position: 0 50%;
+    background-size: 100% 1px;
+}
+
+body[data-place="Village"] .quest-log-line-count {
+    color: rgba(143, 212, 240, 0.95);
+}
+
+body[data-place="Village"] .quest-log-delimiter {
+    background-image: linear-gradient(90deg, rgba(120, 210, 255, 0) 0%, rgba(120, 210, 255, 0.4) 15%, rgba(120, 210, 255, 0.4) 85%, rgba(120, 210, 255, 0) 100%);
+}
+
+body[data-place="MainMap"] .quest-log-line-count {
+    color: rgba(240, 200, 140, 0.95);
+}
+
+body[data-place="MainMap"] .quest-log-delimiter {
+    background-image: linear-gradient(90deg, rgba(224, 164, 88, 0) 0%, rgba(224, 164, 88, 0.4) 15%, rgba(224, 164, 88, 0.4) 85%, rgba(224, 164, 88, 0) 100%);
+}
+
+/* ------------------------------------------------------------
+   Player status / spell / potion HUD -- pinned to the viewport.
+   Originally these ascii buttons (Health/Berserk/Time slowing potions,
+   spell shortcuts, etc. -- see Quest.ts's drawPlayerSpells() and
+   QuestPlayerSpell.ts) are drawn into the same character grid as the
+   rest of the quest world, at a world-column that's supposed to track
+   the camera so they stay put on screen. In a wide, non-scrolling quest
+   (like the Forest) that self-cancelling trick can visibly drift, so
+   instead we lift the whole HUD group out of the panned world grid
+   entirely with position:fixed, anchored to the game panel's own
+   layout (see #game-layout's max-width/centering in the base
+   stylesheet) rather than to any quest-world coordinate. This only
+   changes where these buttons are painted on screen -- their click
+   handlers are wired by class name (see RenderArea.addLinkCall calls),
+   which are completely unaffected by CSS positioning.
+
+   Column/row spacing below mirrors each button's original relative
+   Pos(x, y) from Quest.ts's addPlayerSpell() calls (~9.6px per
+   character column, ~19.2px per grid row at the base 16px font), just
+   measured out from a fixed on-screen origin instead of a scrolling one.
+   ------------------------------------------------------------ */
+.questPlayerSpellHealthPotionButton, .questPlayerSpellTurtlePotionButton,
+.questPlayerSpellAntiGravityPotionButton, .questPlayerSpellBerserkPotionButton,
+.questPlayerSpellCloningPotionButton, .questPlayerSpellPPotionButton, .questPlayerSpellXPotionButton,
+.questPlayerSpellAcidRainButton, .questPlayerSpellFireballButton, .questPlayerSpellTeleportButton,
+.questPlayerSpellEraseMagicButton, .questPlayerSpellThornsShieldButton, .questPlayerSpellBlackDemonsButton,
+.questPlayerSpellTimeSlowingButton, .questPlayerSpellJumpButton, .questPlayerSpellSqueezeButton,
+.questPlayerSpell,
+.quest-spell-countdown-spells, .quest-spell-countdown-potions {
+    position: fixed !important;
+    z-index: 60;
+}
+
+/* Potions row (Health / Turtle / Anti gravity / Berserk / Cloning / P / X). */
+.questPlayerSpellHealthPotionButton { top: 400px; left: calc(max(0px, (100vw - 1400px)/2) + 40px); }
+.questPlayerSpellTurtlePotionButton { top: 400px; left: calc(max(0px, (100vw - 1400px)/2) + 164.8px); }
+.questPlayerSpellAntiGravityPotionButton { top: 400px; left: calc(max(0px, (100vw - 1400px)/2) + 289.6px); }
+.questPlayerSpellBerserkPotionButton { top: 400px; left: calc(max(0px, (100vw - 1400px)/2) + 472px); }
+.questPlayerSpellCloningPotionButton { top: 400px; left: calc(max(0px, (100vw - 1400px)/2) + 606.4px); }
+.questPlayerSpellPPotionButton { top: 400px; left: calc(max(0px, (100vw - 1400px)/2) + 740.8px); }
+.questPlayerSpellXPotionButton { top: 400px; left: calc(max(0px, (100vw - 1400px)/2) + 817.6px); }
+.quest-spell-countdown-potions { top: 400px; left: calc(max(0px, (100vw - 1400px)/2) + 923.2px); }
+
+/* Spells row (Acid rain / Fireball / Teleport / Erase magic / Thorns shield / Black demons). */
+.questPlayerSpellAcidRainButton { top: 361.6px; left: calc(max(0px, (100vw - 1400px)/2) + 40px); }
+.questPlayerSpellFireballButton { top: 361.6px; left: calc(max(0px, (100vw - 1400px)/2) + 145.6px); }
+.questPlayerSpellTeleportButton { top: 361.6px; left: calc(max(0px, (100vw - 1400px)/2) + 241.6px); }
+.questPlayerSpellEraseMagicButton { top: 361.6px; left: calc(max(0px, (100vw - 1400px)/2) + 356.8px); }
+.questPlayerSpellThornsShieldButton { top: 361.6px; left: calc(max(0px, (100vw - 1400px)/2) + 481.6px); }
+.questPlayerSpellBlackDemonsButton { top: 361.6px; left: calc(max(0px, (100vw - 1400px)/2) + 788.8px); }
+.quest-spell-countdown-spells { top: 361.6px; left: calc(max(0px, (100vw - 1400px)/2) + 923.2px); }
+
+/* Item-capacity row (Time slowing / Jump / Squeeze) and the once-per-quest black hole spell. */
+.questPlayerSpellTimeSlowingButton { top: 438.4px; left: calc(max(0px, (100vw - 1400px)/2) + 40px); }
+.questPlayerSpellJumpButton { top: 438.4px; left: calc(max(0px, (100vw - 1400px)/2) + 174.4px); }
+.questPlayerSpellSqueezeButton { top: 438.4px; left: calc(max(0px, (100vw - 1400px)/2) + 232px); }
+.questPlayerSpell { top: 438.4px; left: calc(max(0px, (100vw - 1400px)/2) + 404.8px); }

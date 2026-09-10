@@ -8,15 +8,80 @@
     <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
     
     <script type="text/javascript" src="libs/jquery-1.9.1.min.js"></script>
-    <script type="text/javascript" src="candybox2.js"></script>
+    <script type="text/javascript" src="candybox2.js?v=1789049198"></script>
     
-    <link rel="stylesheet" type="text/css" href="css/design.css"/>
+    <link rel="stylesheet" type="text/css" href="css/design.css?v=1789049198"/>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="favicon.png"/> <!-- Favicon by HacksawUnit (https://twitter.com/HacksawUnit) -->
   </head>
-  <body>
-      <div id="aroundStatusBar"><pre id="statusBar"></pre></div>
-      <pre id="mainContent"></pre>
-      <pre id="versionNumber">Version 1.2.3, <a href="faq.html" target="_blank">FAQ</a>, <a href="http://webchat.quakenet.org/?channels=candybox2&uio=d4" target="_blank">IRC</a>, <a href="http://candybox2.wordpress.com" target="_blank">blog</a>, <a href="http://candybox2.gamepedia.com" target="_blank">wiki</a>, <a href="https://github.com/candybox2/candybox2.github.io" target="_blank">source code</a>, <b><a target="_blank" href="http://candybox2.github.io/candybox/">Candy Box</a></b></pre>
+  <body class="dark-theme">
+      <!-- Top Bar: Statistics -->
+      <header id="topBar">
+          <div class="breadcrumb header-breadcrumb" id="ui-place-subtitle">&laquo; <span class="highlight">THE CANDY BOX</span> &raquo;</div>
+          <div class="stat-box candy-stat">
+              <div class="stat-icon candy-icon"></div>
+              <div class="stat-info">
+                  <div class="stat-label">TOTAL CANDIES</div>
+                  <div class="stat-value"><span id="ui-candies-count">0</span><span class="stat-rate">+<span id="ui-candies-rate">0</span>/s</span></div>
+              </div>
+          </div>
+          <div class="stat-box lollipop-stat" id="ui-lollipop-container" style="display: none;">
+              <div class="stat-icon lollipop-icon"></div>
+              <div class="stat-info">
+                  <div class="stat-label">DELICIOUS LOLLIPOPS</div>
+                  <div class="stat-value" id="ui-lollipops-count">0</div>
+              </div>
+          </div>
+          <div class="stat-box chocolate-stat" id="ui-chocolate-container" style="display: none;">
+              <div class="stat-icon chocolate-icon"></div>
+              <div class="stat-info">
+                  <div class="stat-label">CHOCOLATE BARS</div>
+                  <div class="stat-value" id="ui-chocolate-count">0</div>
+              </div>
+          </div>
+          <div class="stat-box pain-stat" id="ui-pain-container" style="display: none;">
+              <div class="stat-icon pain-icon"></div>
+              <div class="stat-info">
+                  <div class="stat-label">PAINS AU CHOCOLAT</div>
+                  <div class="stat-value" id="ui-pain-count">0</div>
+              </div>
+          </div>
+          
+          <button id="dev-mode-btn" onclick="if(typeof DevMode !== 'undefined') { DevMode.toggle(); this.innerText = DevMode.isEnabled ? 'DEV MODE: ON (100x)' : 'DEV MODE: OFF'; }">DEV MODE: OFF</button>
+      </header>
+
+      <!-- Main Layout -->
+      <main id="game-layout">
+          <!-- Left Panel: Candy Box & Interactions -->
+          <section id="left-panel">
+              <h1 class="main-title" id="ui-place-title">A STRANGE BOX<br>PRODUCING SWEETS.</h1>
+              <p class="place-flavor-quote" id="ui-place-flavor"></p>
+              
+              <!-- Modern navigation tabs (replaces the ASCII status bar tabs, driven by UIBridge) -->
+              <nav id="ui-nav-tabs" class="game-nav" style="display: none;"></nav>
+              
+              <!-- Modern player health bar (replaces the ASCII health bar, driven by UIBridge) -->
+              <div id="ui-health-container" class="health-bar-container" style="display: none;">
+                  <div class="health-bar-track">
+                      <div id="ui-health-fill" class="health-bar-fill" style="width: 0%;"></div>
+                      <div id="ui-health-text" class="health-bar-text">0 / 0</div>
+                  </div>
+              </div>
+              
+              <!-- Original Game Content (we will extract from this or style it) -->
+              <div id="original-game-container">
+                  <div id="aroundStatusBar"><pre id="statusBar"></pre></div>
+                  <pre id="mainContent"></pre>
+              </div>
+          </section>
+
+          <!-- Right Panel: Merchant / Extra Content -->
+          <section id="right-panel">
+              <!-- Content will be moved here or generated here -->
+          </section>
+      </main>
+
+      <pre id="versionNumber">Version 1.2.3, <a href="faq.html" target="_blank">FAQ</a>, <a href="https://github.com/candybox2/candybox2.github.io" target="_blank">source code</a></pre>
   </body>
 </html>
 

@@ -99,8 +99,8 @@ class StatusBar{
         // We erase
         this.renderArea.resetAllButSize();
         
-        // We draw the borders
-        if(Saving.loadBool("statusBarUnlocked")){
+        // We DO NOT draw the borders (moved to new UI)
+        /*if(Saving.loadBool("statusBarUnlocked")){
             this.renderArea.drawString("+", 0, 0);
             this.renderArea.drawString("+", this.renderArea.getWidth() - 1, 0);
             this.renderArea.drawString("+", 0, 5);
@@ -109,19 +109,19 @@ class StatusBar{
             this.renderArea.drawVerticalLine("|", this.renderArea.getWidth() - 1, 1, 4);
             this.renderArea.drawHorizontalLine("-", 1, this.renderArea.getWidth() - 1, 0);
             this.renderArea.drawHorizontalLine("-", 1, this.renderArea.getWidth() - 1, 5);
-        }
+        }*/
             
-        // We draw the candies we have
-        this.renderArea.drawString(this.game.getCandies().getCurrentAsString(26), 2, 1);
+        // We DO NOT draw the candies we have (moved to new UI)
+        // this.renderArea.drawString(this.game.getCandies().getCurrentAsString(26), 2, 1);
         
-        // We draw the lollipops we have, if we had at least one at some point
-        if(this.game.getLollipops().getMax() > 0) this.renderArea.drawString(this.game.getLollipops().getCurrentAsString(26), 2, 2);
+        // We DO NOT draw the lollipops we have, if we had at least one at some point (moved to new UI)
+        // if(this.game.getLollipops().getMax() > 0) this.renderArea.drawString(this.game.getLollipops().getCurrentAsString(26), 2, 2);
         
-        // We draw the chocolate bars we have, if we had at least one at some point
-        if(this.game.getChocolateBars().getMax() > 0) this.renderArea.drawString(this.game.getChocolateBars().getCurrentAsString(26), 2, 3);
+        // We DO NOT draw the chocolate bars we have, if we had at least one at some point
+        // if(this.game.getChocolateBars().getMax() > 0) this.renderArea.drawString(this.game.getChocolateBars().getCurrentAsString(26), 2, 3);
         
-        // We draw the pains au chocolat we have, if we had at least one at some point
-        if(this.game.getPainsAuChocolat().getMax() > 0) this.renderArea.drawString(this.game.getPainsAuChocolat().getCurrentAsString(26), 2, 4);
+        // We DO NOT draw the pains au chocolat we have, if we had at least one at some point
+        // if(this.game.getPainsAuChocolat().getMax() > 0) this.renderArea.drawString(this.game.getPainsAuChocolat().getCurrentAsString(26), 2, 4);
         
         // We draw tabs
         this.drawTabs();

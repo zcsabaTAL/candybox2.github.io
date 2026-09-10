@@ -892,14 +892,20 @@ class Quest extends Place{
             
             // Draw the spell countdown
             if(this.playerSpellsCountdown > 0){
-                this.renderArea.drawString("(" + Math.ceil(this.playerSpellsCountdown/10).toString() + " sec)", baseXPosition + 92, 2);
+                var spellsCountdownText: string = "(" + Math.ceil(this.playerSpellsCountdown/10).toString() + " sec)";
+                this.renderArea.drawString(spellsCountdownText, baseXPosition + 92, 2);
                 this.renderArea.addColor(baseXPosition + 92, baseXPosition + 100, 2, new Color(ColorType.QUEST_COUNTDOWN));
+                // "quest-spell-countdown-spells" lets design.css pin this alongside the (also
+                // CSS-pinned) spell buttons themselves -- see QuestPlayerSpell's button classes.
+                this.renderArea.addTwoTags(baseXPosition + 92, baseXPosition + 92 + spellsCountdownText.length, 2, "<span class=\"quest-spell-countdown-spells\">", "</span>");
             }
             
             // Draw the potion countdown
             if(this.playerPotionsCountdown > 0){
-                this.renderArea.drawString("(" + Math.ceil(this.playerPotionsCountdown/10).toString() + " sec)", baseXPosition + 92, 4);
+                var potionsCountdownText: string = "(" + Math.ceil(this.playerPotionsCountdown/10).toString() + " sec)";
+                this.renderArea.drawString(potionsCountdownText, baseXPosition + 92, 4);
                 this.renderArea.addColor(baseXPosition + 92, baseXPosition + 100, 4, new Color(ColorType.QUEST_COUNTDOWN));
+                this.renderArea.addTwoTags(baseXPosition + 92, baseXPosition + 92 + potionsCountdownText.length, 4, "<span class=\"quest-spell-countdown-potions\">", "</span>");
             }
         }
     }

@@ -24,7 +24,9 @@ class QuestLog{
     public draw(renderArea: RenderArea, pos: Pos): void{
         // We draw the lines
         renderArea.drawHorizontalLine("-", pos.x, pos.x+100, pos.y);
+        renderArea.addTwoTags(pos.x, pos.x+100, pos.y, "<span class=\"quest-log-delimiter\">", "</span>");
         renderArea.drawHorizontalLine("-", pos.x, pos.x+100, pos.y+11);
+        renderArea.addTwoTags(pos.x, pos.x+100, pos.y+11, "<span class=\"quest-log-delimiter\">", "</span>");
         
         // We draw the messages
         for(var i = 0; i < this.messages.length; i++){

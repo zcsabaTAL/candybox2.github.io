@@ -166,6 +166,7 @@ class Game{
         // We launch timeouts & intervals methods
         this.oneSecondIntervalId = window.setInterval(this.oneSecondMethod.bind(this), 1000);
         window.setTimeout(this.questMethod.bind(this), 100);
+        
     }
     
     // Public methods
@@ -720,30 +721,54 @@ class Game{
     }
     
     private handleCandiesProduction(): void{
-        this.candies.add(Saving.loadNumber("lollipopFarmCurrentCandiesProduction"));
+        var production = Saving.loadNumber("lollipopFarmCurrentCandiesProduction");
+        if (production === 0) production = 1; // Base production when idle
+        
+        if (typeof DevMode !== "undefined" && DevMode.isEnabled) {
+            production *= 100;
+        }
+        
+        this.candies.add(production);
     }
     
     private handleLollipopProduction(): void{
         // If at least one lollipop is planted
         if(Saving.loadNumber("lollipopFarmLollipopsPlanted") > 0){
+            // Same DevMode speed-up as the candies production above: simulate 100 real
+            // seconds' worth of lollipop production per actual second instead of 1.
+            var devMultiplier: number = (typeof DevMode !== "undefined" && DevMode.isEnabled) ? 100 : 1;
+
             // If the production is each second
             if(Saving.loadBool("lollipopFarmIsProductionEachSecond")){
-                // We just add the production as lollipops
-                this.lollipops.add(Saving.loadNumber("lollipopFarmProduction"));
+                // We just add the production as lollipops (x100 in DevMode)
+                this.lollipops.add(Saving.loadNumber("lollipopFarmProduction") * devMultiplier);
             }
             // Else
             else{
-                // If it's time for a new production
-                if(Saving.loadNumber("lollipopFarmTimeSinceLastProduction") >= Saving.loadNumber("lollipopFarmProduction") - 1){
-                    // We reset the time
-                    Saving.saveNumber("lollipopFarmTimeSinceLastProduction", 0);
-                    // We add one lollipop
-                    this.lollipops.add(1);
+                var production: number = Saving.loadNumber("lollipopFarmProduction");
+                var time: number = Saving.loadNumber("lollipopFarmTimeSinceLastProduction");
+                var secondsToSimulate: number = devMultiplier;
+
+                // Simulate `secondsToSimulate` one-second ticks at once (100 in DevMode, 1 otherwise --
+                // in which case this is exactly the original, unchanged behaviour). Looping instead of
+                // jumping the timer straight by devMultiplier makes sure we don't miss productions when
+                // several of them would happen within the simulated span.
+                while(secondsToSimulate > 0){
+                    // If it's time for a new production
+                    if(time >= production - 1){
+                        // We reset the time
+                        time = 0;
+                        // We add one lollipop
+                        this.lollipops.add(1);
+                    }
+                    else{
+                        // We increase the time
+                        time++;
+                    }
+                    secondsToSimulate--;
                 }
-                else{
-                    // We increase the time
-                    Saving.saveNumber("lollipopFarmTimeSinceLastProduction", Saving.loadNumber("lollipopFarmTimeSinceLastProduction") + 1);
-                }
+
+                Saving.saveNumber("lollipopFarmTimeSinceLastProduction", time);
             }
         }
     }

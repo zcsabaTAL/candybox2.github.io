@@ -16,6 +16,9 @@ module LocalSaving{
         if(loadString(slotId) == null)
             return false;
         
+        // Remember this as the last used slot too, so we stay in sync with the save() bookkeeping
+        localStorage.setItem("lastUsedSlotId", slotId);
+        
         // Load bools
         for(var str in Saving.getAllBools()){
             Saving.saveBool(str, this.loadBool(slotId + "." + str));
@@ -39,6 +42,9 @@ module LocalSaving{
         try{
             // Set the date on the slotId localStorage item
             localStorage.setItem(slotId, getDateAsString());
+            
+            // Remember this as the last used slot, so a plain page load (no ?slot= in the url) can auto-resume it
+            localStorage.setItem("lastUsedSlotId", slotId);
             
             // Save bools
             for(var str in Saving.getAllBools()){

@@ -33,18 +33,38 @@ module Main{
         start();
     }
     
-    export function setUrlData(urlData: string): void{
-        // Create some variables
-        var beforeEqual: string;
-        var afterEqual: string;
+    // If the url didn't explicitly ask for a slot or a gamemode, silently resume the last slot we saved to or loaded
+    // (if local saving is supported and that slot still has data). This only changes the auto-resume behavior on a
+    // plain page load; an explicit ?slot=N or ?gamemode=X in the url is never overridden.
+    export function autoResumeLastSlotIfNoUrlData(): void{
+        if(loadingType != MainLoadingType.NONE) return; // An explicit ?slot= or ?gamemode= already won
+        if(!LocalSaving.supportsLocalSaving()) return;
         
-        // If there's something in the url and we can find an equal sign and this equal sign isn't the last character of the string
-        if(urlData != "" && urlData.indexOf("=") != -1 && urlData.indexOf("=") < urlData.length-1){
-            // Strip the question mark
-            urlData = urlData.substr(1);
-            // Separate the data in two parts : before and after the equal sign
-            beforeEqual = urlData.substr(0, urlData.indexOf("="));
-            afterEqual = urlData.substr(urlData.indexOf("=") + 1);
+        var lastUsedSlotId: string = localStorage.getItem("lastUsedSlotId");
+        if(lastUsedSlotId != null && localStorage.getItem(lastUsedSlotId) != null){
+            loadingType = MainLoadingType.LOCAL;
+            loadingString = lastUsedSlotId;
+        }
+    }
+    
+    export function setUrlData(urlData: string): void{
+        // If there's nothing in the url, or it doesn't start with "?", there's nothing to parse
+        if(urlData == "" || urlData.charAt(0) != "?") return;
+        
+        // Strip the question mark, then split into individual "key=value" pairs on "&" so that
+        // any number of query parameters (in any order) are handled correctly -- not just a single one.
+        var pairs: string[] = urlData.substr(1).split("&");
+        
+        for(var i = 0; i < pairs.length; i++){
+            var pair: string = pairs[i];
+            var eqIndex: number = pair.indexOf("=");
+            
+            // Skip pairs without an equal sign, or where the equal sign is the last character
+            if(eqIndex == -1 || eqIndex == pair.length - 1) continue;
+            
+            var beforeEqual: string = pair.substr(0, eqIndex);
+            var afterEqual: string = pair.substr(eqIndex + 1);
+            
             // Do different things depending on the value of beforeEqual
             switch(beforeEqual){
                 // If we're trying to load a local slot
@@ -65,10 +85,24 @@ module Main{
         Keyboard.setGame(game);
         Saving.load(game, loadingType, loadingString);
         game.postLoad();
+        
+        // Initialize the custom UI Bridge only now, once the save data (if any) has actually been
+        // loaded into the game's resources. Doing this earlier (e.g. inside the Game constructor)
+        // means the first tick(s) render zeroed-out / hidden stats, which then suddenly snap to the
+        // real loaded values a moment later -- visible as a flash/flicker when loading a save.
+        if (typeof UIBridge !== "undefined") new UIBridge(game);
     }
 }
 
 $(document).ready(function(){
+    // Groups the hover highlight across multi-row ASCII objects (map landmarks, the
+    // grimoire in the Sorceress' Hut, etc.) instead of only lighting up the single
+    // row/character under the cursor. Independent of game state, so it's safe to set
+    // up immediately.
+    if (typeof AsciiGroupHover !== "undefined") AsciiGroupHover.init();
+    if (typeof PlaceAmbience !== "undefined") PlaceAmbience.init();
+
     Main.setUrlData(window.location.search);
+    Main.autoResumeLastSlotIfNoUrlData();
     Main.documentIsReady();
 });
