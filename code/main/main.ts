@@ -101,6 +101,7 @@ $(document).ready(function(){
     // up immediately.
     if (typeof AsciiGroupHover !== "undefined") AsciiGroupHover.init();
     if (typeof PlaceAmbience !== "undefined") PlaceAmbience.init();
+    if (typeof MusicBridge !== "undefined") MusicBridge.init();
 
     Main.setUrlData(window.location.search);
     Main.autoResumeLastSlotIfNoUrlData();

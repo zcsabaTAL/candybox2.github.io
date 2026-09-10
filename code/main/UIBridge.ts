@@ -69,6 +69,12 @@ class UIBridge {
             // scripts) can scope a visual treatment to one specific place -- e.g. the
             // Village's cool-toned ascii reskin -- without touching every other screen.
             document.body.setAttribute("data-place", currentPlaceName);
+
+            // Switch background music to match: place-specific track if one exists, else the
+            // fight theme on any quest/combat screen, else the main theme everywhere else.
+            if (typeof MusicBridge !== "undefined") {
+                MusicBridge.setPlace(currentPlaceName, currentPlace instanceof Quest);
+            }
             
             var titleEl = document.getElementById("ui-place-title");
             var subtitleEl = document.getElementById("ui-place-subtitle");
