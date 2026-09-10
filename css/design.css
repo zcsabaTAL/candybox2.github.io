@@ -596,6 +596,93 @@ body[data-place="Village"] .place-flavor-quote {
 }
 
 /* ============================================================
+   Header music control (volume slider + mute toggle), sitting
+   just to the left of the dev-mode button. Mirrors its visual
+   language (dark pill, subtle border, Montserrat) so the two
+   read as one control cluster in the header.
+   ============================================================ */
+
+#music-control {
+    position: fixed;
+    top: 20px;
+    right: 130px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(20, 20, 25, 0.8);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 4px;
+    padding: 6px 12px;
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+#music-control:hover {
+    border-color: rgba(255,255,255,0.4);
+}
+
+#music-mute-btn {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 15px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    opacity: 0.85;
+    transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+#music-mute-btn:hover {
+    opacity: 1;
+}
+
+#music-control.music-muted #music-mute-btn {
+    color: #ff0055;
+    opacity: 1;
+}
+
+#music-volume-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 70px;
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.25);
+    cursor: pointer;
+    outline: none;
+}
+
+#music-volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.3);
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+#music-volume-slider::-moz-range-thumb {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.3);
+    cursor: pointer;
+}
+
+#music-control.music-muted #music-volume-slider::-webkit-slider-thumb {
+    background: #ff0055;
+}
+
+#music-control.music-muted #music-volume-slider::-moz-range-thumb {
+    background: #ff0055;
+}
+
+/* ============================================================
    Village pilot: cool-toned ascii reskin + floating glow marker
    Scoped to body[data-place="Village"] (set by UIBridge) so it
    doesn't touch any other screen while this is being piloted.

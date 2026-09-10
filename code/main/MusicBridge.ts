@@ -12,6 +12,10 @@
 // playback only actually starts after the first click/keydown anywhere on the page -- which
 // happens naturally the moment someone clicks any of the game's own buttons. Until then, the
 // desired track is just remembered and applied once that first interaction happens.
+//
+// Volume and mute are a device-level preference (like the browser's own volume), not part of
+// a save slot -- they're kept in localStorage directly under fixed keys, completely separate
+// from Saving/LocalSaving, so switching or loading a save slot never changes them.
 class MusicBridge {
     // Place class name -> track path. Anything not listed here falls back to the fight theme
     // (if the place is a Quest, i.e. a combat/exploration screen) or the main theme otherwise.
@@ -25,6 +29,9 @@ class MusicBridge {
     private static MAIN_THEME: string = "music/main-theme.mp3";
     private static FIGHT_THEME: string = "music/fight.mp3";
 
+    private static VOLUME_STORAGE_KEY: string = "musicBridgeVolume"; // 0-100
+    private static MUTED_STORAGE_KEY: string = "musicBridgeMuted"; // "1" or "0"
+
     // Two <audio> elements so we can crossfade: one is always "active" (audible, playing the
     // current track) while the other is either silent/paused or mid-fade.
     private static audioA: HTMLAudioElement = null;
@@ -32,7 +39,11 @@ class MusicBridge {
     private static activeIsA: boolean = true;
 
     private static currentTrack: string = null;
-    private static desiredVolume: number = 0.45;
+
+    // sliderVolume is what the volume slider is set to (0-1), independent of mute -- muting
+    // doesn't move the slider, it just silences playback until unmuted.
+    private static sliderVolume: number = 0.45;
+    private static muted: boolean = false;
     private static fadeTimer: any = null;
 
     // Autoplay gating: until the user has interacted with the page once, we just remember what
@@ -44,6 +55,8 @@ class MusicBridge {
 
     public static init(): void {
         if (MusicBridge.audioA !== null) return; // Already initialized
+
+        MusicBridge.loadPreferences();
 
         MusicBridge.audioA = MusicBridge.createAudioElement();
         MusicBridge.audioB = MusicBridge.createAudioElement();
@@ -92,12 +105,67 @@ class MusicBridge {
         MusicBridge.crossfade(incoming, outgoing);
     }
 
-    // Public setter so a future volume/mute control can hook in without touching the rest of
-    // this class.
-    public static setVolume(volume: number): void {
-        MusicBridge.desiredVolume = volume;
-        var active: HTMLAudioElement = MusicBridge.activeIsA ? MusicBridge.audioB : MusicBridge.audioA;
-        if (MusicBridge.fadeTimer === null) active.volume = volume;
+    // 0-100, as driven by the header volume slider.
+    public static setVolume(volumePercent: number): void {
+        MusicBridge.sliderVolume = Math.max(0, Math.min(100, volumePercent)) / 100;
+        MusicBridge.savePreferences();
+
+        // Setting the slider above 0 while muted implicitly unmutes, same as most volume UIs.
+        if (MusicBridge.muted && MusicBridge.sliderVolume > 0) MusicBridge.muted = false;
+
+        MusicBridge.applyVolumeToActiveTrack();
+    }
+
+    public static getVolume(): number {
+        return Math.round(MusicBridge.sliderVolume * 100);
+    }
+
+    public static toggleMute(): void {
+        MusicBridge.muted = !MusicBridge.muted;
+        MusicBridge.savePreferences();
+        MusicBridge.applyVolumeToActiveTrack();
+    }
+
+    public static isMuted(): boolean {
+        return MusicBridge.muted;
+    }
+
+    // Only meaningful once init() has run.
+    public static isReady(): boolean {
+        return MusicBridge.audioA !== null;
+    }
+
+    private static effectiveVolume(): number {
+        return MusicBridge.muted ? 0 : MusicBridge.sliderVolume;
+    }
+
+    // Applies the current effective volume to whichever track is actually audible right now,
+    // without restarting a crossfade -- used when the user drags the slider or hits mute
+    // outside of a place change.
+    private static applyVolumeToActiveTrack(): void {
+        if (MusicBridge.fadeTimer !== null) return; // A crossfade is already driving the volume; let it finish
+        // activeIsA flips at the END of setPlace() to record which element is now playing,
+        // so the currently-playing track is the OPPOSITE of what activeIsA points to here.
+        var active: HTMLAudioElement = MusicBridge.activeIsA ? MusicBridge.audioA : MusicBridge.audioB;
+        if (active) active.volume = MusicBridge.effectiveVolume();
+    }
+
+    private static loadPreferences(): void {
+        try {
+            var storedVolume: string = localStorage.getItem(MusicBridge.VOLUME_STORAGE_KEY);
+            if (storedVolume !== null) {
+                var parsed: number = parseInt(storedVolume, 10);
+                if (!isNaN(parsed)) MusicBridge.sliderVolume = Math.max(0, Math.min(100, parsed)) / 100;
+            }
+            MusicBridge.muted = localStorage.getItem(MusicBridge.MUTED_STORAGE_KEY) === "1";
+        } catch (e) { /* localStorage unavailable (e.g. private browsing) -- fall back to defaults */ }
+    }
+
+    private static savePreferences(): void {
+        try {
+            localStorage.setItem(MusicBridge.VOLUME_STORAGE_KEY, Math.round(MusicBridge.sliderVolume * 100).toString());
+            localStorage.setItem(MusicBridge.MUTED_STORAGE_KEY, MusicBridge.muted ? "1" : "0");
+        } catch (e) { /* Ignore -- preference just won't persist this session */ }
     }
 
     private static createAudioElement(): HTMLAudioElement {
@@ -113,7 +181,7 @@ class MusicBridge {
 
         var totalSteps: number = 30; // ~1.2s fade at 40ms/step
         var step: number = 0;
-        var target: number = MusicBridge.desiredVolume;
+        var target: number = MusicBridge.effectiveVolume();
         var wasPlaying: boolean = !outgoing.paused;
 
         MusicBridge.fadeTimer = setInterval(function (): void {
@@ -128,5 +196,39 @@ class MusicBridge {
                 outgoing.pause();
             }
         }, 40);
+    }
+}
+
+// Tiny header widget wiring for MusicBridge: keeps the volume slider and the
+// mute button's visual state (icon + ".music-muted" class) in sync with
+// MusicBridge's actual state, both on load and after every user interaction
+// with the control. Kept separate from MusicBridge itself so MusicBridge stays
+// a pure audio engine with no DOM/UI concerns of its own.
+class MusicVolumeUI {
+    public static init(): void {
+        if (typeof MusicBridge === "undefined" || !MusicBridge.isReady()) return;
+
+        var slider: any = document.getElementById("music-volume-slider");
+        if (slider) slider.value = MusicBridge.getVolume().toString();
+
+        MusicVolumeUI.refresh();
+    }
+
+    public static refresh(): void {
+        if (typeof MusicBridge === "undefined") return;
+
+        var container: HTMLElement = document.getElementById("music-control");
+        var muteBtn: HTMLElement = document.getElementById("music-mute-btn");
+        var slider: any = document.getElementById("music-volume-slider");
+
+        var muted: boolean = MusicBridge.isMuted();
+
+        if (container) {
+            if (muted) container.className = (container.className + " music-muted").trim();
+            else container.className = container.className.replace(/\s*music-muted\s*/g, " ").trim();
+        }
+
+        if (muteBtn) muteBtn.innerHTML = muted ? "&#9835;" : "&#9834;"; // filled vs. outline note glyph; color flips via .music-muted
+        if (slider) slider.value = MusicBridge.getVolume().toString();
     }
 }
