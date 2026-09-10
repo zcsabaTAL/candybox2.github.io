@@ -22,8 +22,16 @@ class MusicBridge {
     private static PLACE_TRACKS: any = {
         "Village": "music/places/village.mp3",
         "SorceressHut": "music/places/sorceressHut.mp3",
+        // The Cauldron is the witch's own workspace (reached from her hut), so it shares her
+        // theme rather than getting a separate track.
+        "Cauldron": "music/places/sorceressHut.mp3",
         "Lighthouse": "music/places/lighthouse.mp3",
-        "Desert": "music/places/desert.mp3"
+        "Desert": "music/places/desert.mp3",
+        // Inventory / Save / Settings (Cfg) are menu-like screens rather than "places" with their
+        // own atmosphere, so they all share one calmer, out-of-the-action theme.
+        "Inventory": "music/menus.mp3",
+        "Save": "music/menus.mp3",
+        "Cfg": "music/menus.mp3"
     };
 
     private static MAIN_THEME: string = "music/main-theme.mp3";

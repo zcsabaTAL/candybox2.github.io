@@ -563,11 +563,22 @@ body[data-place="Village"] .place-flavor-quote {
    of the new header. */
 
 
-/* Dev Mode Button */
-#dev-mode-btn {
+/* Header controls cluster: wraps the music control + dev-mode button so they lay
+   out side by side via flexbox instead of two independently-guessed fixed-position
+   offsets (which drifted out of sync and overlapped once the dev-mode button's text
+   width changed). */
+#header-controls {
     position: fixed;
     top: 20px;
     right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 1000;
+}
+
+/* Dev Mode Button */
+#dev-mode-btn {
     background: rgba(20, 20, 25, 0.8);
     border: 1px solid rgba(255,255,255,0.2);
     color: #fff;
@@ -577,7 +588,7 @@ body[data-place="Village"] .place-flavor-quote {
     cursor: pointer;
     font-size: 11px;
     letter-spacing: 1px;
-    z-index: 1000;
+    white-space: nowrap;
     transition: all 0.3s ease;
 }
 
@@ -603,9 +614,6 @@ body[data-place="Village"] .place-flavor-quote {
    ============================================================ */
 
 #music-control {
-    position: fixed;
-    top: 20px;
-    right: 130px;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -613,7 +621,7 @@ body[data-place="Village"] .place-flavor-quote {
     border: 1px solid rgba(255,255,255,0.2);
     border-radius: 4px;
     padding: 6px 12px;
-    z-index: 1000;
+    white-space: nowrap;
     transition: all 0.3s ease;
 }
 
