@@ -75,6 +75,9 @@ class UIBridge {
             if (typeof MusicBridge !== "undefined") {
                 MusicBridge.setPlace(currentPlaceName, currentPlace instanceof Quest);
             }
+            if (typeof VoiceBridge !== "undefined") {
+                VoiceBridge.setPlace(currentPlaceName);
+            }
             
             var titleEl = document.getElementById("ui-place-title");
             var subtitleEl = document.getElementById("ui-place-subtitle");

@@ -85,6 +85,9 @@ class Lighthouse extends Place{
     // Public setters
     public setSpeechId(speechId: string): void{
         this.speechId = speechId;
+        if(typeof VoiceBridge !== "undefined"){
+            VoiceBridge.playLighthouseEvent(speechId);
+        }
     }
     
     // Private methods
@@ -103,6 +106,10 @@ class Lighthouse extends Place{
         else this.showPuzzle = false;
         this.update();
         this.getGame().updatePlace();
+        
+        if(typeof VoiceBridge !== "undefined"){
+            VoiceBridge.playLighthouseQuestion(this.selectedQuestionId);
+        }
     }
     
     private createQuestionsArray(): void{
