@@ -31,6 +31,9 @@ class Dragon extends CastleRoom{
         else{ // Else, we already talked with the dragon
             this.step = DragonStep.TALKING;
             this.playerPos = 60;
+            if(typeof VoiceBridge !== "undefined"){
+                VoiceBridge.playDragonEvent("dragonTalking");
+            }
         }
         
         // Launch the interval and get the ID
@@ -49,6 +52,9 @@ class Dragon extends CastleRoom{
     // willStopBeingDisplayed()
     public willStopBeingDisplayed(): void{
         clearInterval(this.timerIntervalID);
+        if(typeof VoiceBridge !== "undefined"){
+            VoiceBridge.stop();
+        }
     }
     
     // Private methods
@@ -74,6 +80,9 @@ class Dragon extends CastleRoom{
                 if(this.playerAttackingCountdown < 0){ // If it's time to stop attacking
                     // We're now "stop tickling"
                     this.step = DragonStep.STOP_TICKLING;
+                    if(typeof VoiceBridge !== "undefined"){
+                        VoiceBridge.playDragonEvent("dragonStopTickling");
+                    }
                 }
                 // Update
                 this.update();
@@ -87,6 +96,9 @@ class Dragon extends CastleRoom{
         this.step = DragonStep.TALKING_CANDIES;
         // Set the bool
         Saving.saveBool("dragonUnlockedCyclops", true);
+        if(typeof VoiceBridge !== "undefined"){
+            VoiceBridge.playDialogue("audio/voice/player/dragonTalkingCandiesButton.mp3", "audio/voice/dragon/dragonTalkingCandiesSpeech.wav");
+        }
         // Update
         this.update();
         this.getGame().updatePlace();
@@ -95,6 +107,9 @@ class Dragon extends CastleRoom{
     private chooseChallenge(): void{
         // Change the step
         this.step = DragonStep.TALKING_CHALLENGE;
+        if(typeof VoiceBridge !== "undefined"){
+            VoiceBridge.playDialogue("audio/voice/player/dragonTalkingChallengeButton.mp3", "audio/voice/dragon/dragonTalkingChallengeSpeech.wav");
+        }
         // Update
         this.update();
         this.getGame().updatePlace();
@@ -103,6 +118,9 @@ class Dragon extends CastleRoom{
     private chooseFame(): void{
         // Change the step
         this.step = DragonStep.TALKING_FAME;
+        if(typeof VoiceBridge !== "undefined"){
+            VoiceBridge.playDialogue("audio/voice/player/dragonTalkingFameButton.mp3", "audio/voice/dragon/dragonTalkingFameSpeech.wav");
+        }
         // Update
         this.update();
         this.getGame().updatePlace();
@@ -126,6 +144,9 @@ class Dragon extends CastleRoom{
             this.step = DragonStep.TALKING;
             // Set the bool
             Saving.saveBool("dragonDone", true);
+            if(typeof VoiceBridge !== "undefined"){
+                VoiceBridge.playDialogue("audio/voice/player/dragonStopTicklingButton.mp3", "audio/voice/dragon/dragonTalking.wav");
+            }
             // Update
             this.update();
             this.getGame().updatePlace();

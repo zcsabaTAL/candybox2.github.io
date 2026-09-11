@@ -15,6 +15,11 @@ class VoiceBridge {
         VoiceBridge.playSingle(cyclopsFile);
     }
 
+    public static playDragonEvent(eventId: string): void {
+        var dragonFile: string = "audio/voice/dragon/" + eventId + ".wav";
+        VoiceBridge.playSingle(dragonFile);
+    }
+
     public static playDialogue(playerTrack: string, responderTrack: string): void {
         VoiceBridge.stop();
 
