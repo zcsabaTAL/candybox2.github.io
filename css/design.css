@@ -1404,3 +1404,542 @@ body[data-place="LollipopFarm"] .millArt {
 #world-object-mill .world-object-mote:nth-child(1) { left: 30%; bottom: 55%; animation-delay: 0s;   animation-duration: 5.5s; }
 #world-object-mill .world-object-mote:nth-child(2) { left: 55%; bottom: 60%; animation-delay: 1.8s; animation-duration: 6.5s; }
 #world-object-mill .world-object-mote:nth-child(3) { left: 42%; bottom: 50%; animation-delay: 3.4s; animation-duration: 5.8s; }
+
+/* ================================================================
+   LollipopFarm cyan re-theme
+   Extends the Wishing Well's rune-panel visual language (see
+   body[data-place="WishingWell"] rules above) across the farm's
+   interactive controls: planting chips, mill/pond action buttons,
+   and a backdrop panel behind the planting/production readout.
+   ================================================================ */
+
+body[data-place="LollipopFarm"] .asciiRealButton {
+    border-color: rgba(0, 229, 255, 0.3);
+    background: rgba(15, 22, 32, 0.7);
+}
+body[data-place="LollipopFarm"] .asciiRealButton:hover {
+    border-color: #00e5ff;
+    background: rgba(15, 35, 42, 0.85);
+    box-shadow: 0 0 15px rgba(0, 229, 255, 0.4), inset 0 0 10px rgba(0, 229, 255, 0.2);
+    color: #fff;
+}
+
+/* Compact "chip" style for the short numeric planting buttons (1/10/100/1000).
+   The default .asciiRealButton padding (6px 16px) is far wider than the few
+   ch-columns the game's own layout math allocates these buttons, which made
+   them visibly overlap (verified live: e.g. the "1" and "10" buttons'
+   rendered boxes overlapped by ~24px). This chip keeps the cyan theme but
+   with much tighter padding/font so it actually fits its column budget;
+   LollipopFarm.ts's plantingButtonsXPos increments were re-tuned to this
+   chip's live-measured width, not the original (unpadded) assumption. */
+body[data-place="LollipopFarm"] .lollipopQuantityChip {
+    padding: 3px 7px;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    min-width: 0;
+}
+
+/* Backdrop panel behind the planting/production readout ("Lollipops planted /
+   Plant 1-10-100-1000 lollipops / Production"), positioned from the live-
+   measured row grid (row height ~14.4px, column width ~7.2px, both matching
+   the values already established for the Mill's placement above). */
+body[data-place="LollipopFarm"] #original-game-container::before {
+    content: "";
+    position: absolute;
+    left: -8px;
+    top: 482px;
+    width: 320px;
+    height: 88px;
+    border: 1px solid rgba(0, 229, 255, 0.2);
+    border-radius: 10px;
+    background: linear-gradient(180deg, rgba(15, 22, 32, 0.55) 0%, rgba(8, 12, 18, 0.4) 100%);
+    box-shadow: 0 0 25px rgba(0, 229, 255, 0.06) inset;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* ================================================================
+   LollipopFarm pond: painted background (static world-object, same
+   registration pattern as the Well/Mill -- see WorldObjectLayer.ts)
+   plus dynamically-created/positioned painted lolligator sprites
+   (see PondLolligator.ts's syncSprite/removeSprite -- unlike the
+   Well/Mill these are created and destroyed continuously as they
+   swim across the pond, so they can't be pre-built like the static
+   objects above).
+   ================================================================ */
+
+#original-game-container:has(.pondArt) #world-object-pond {
+    display: block;
+    /* Sized/positioned from the live-measured .pondArt bounding box (left:360 top:202
+       width:374 height:215 px, drawPondStuff(50,14) -> 50*7.2=360, 14*14.4=201.6, matching
+       the same grid constants established for the Mill), with a little padding and centered
+       on that box; pond.png's own aspect (976x568, ~1.718 w/h) is close enough to the ascii
+       box's (~1.74) that neither dimension needs to stretch noticeably. */
+    left: 347px;
+    top: 193px;
+    width: 400px;
+    height: 233px;
+    background-image: url('../images/places/lollipopFarm/pond.png');
+    pointer-events: none;
+}
+body[data-place="LollipopFarm"] .pondArt {
+    visibility: hidden;
+}
+body[data-place="LollipopFarm"] .barnArt {
+    visibility: hidden;
+}
+body[data-place="LollipopFarm"] .fieldTextArt {
+    visibility: hidden;
+}
+
+body[data-place="LollipopFarm"] #world-object-barn {
+    display: block;
+    left: 273px;
+    top: 70px;
+    width: 330px;
+    height: 118px;
+    background-image: url('../images/places/lollipopFarm/barn.png');
+    pointer-events: none;
+}
+
+body[data-place="LollipopFarm"] #world-object-barn::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -3px;
+    width: 90%;
+    height: 12px;
+    transform: translateX(-50%);
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 75%);
+    filter: blur(6px);
+    z-index: -1;
+    pointer-events: none;
+}
+
+
+/* Painted, static "sunbathing" lolligator -- one per owned lolligator (capped, see
+   LollipopFarm.ts's LOLLIGATOR_BASKER_SPOTS/syncLolligatorBaskers), sitting on a fixed shore
+   spot rather than trying to mirror the ascii swim simulation's live position/count (that
+   was tried first -- see git history -- but the fade-in/out made them barely ever visible;
+   a simple, reliably-visible count is worth more here than exact fidelity to the swim sim).
+   Deliberately does NOT use the "world-object-" id/class prefix that the static Well/Mill/
+   Pond background use (see the shared #original-game-container > [id^="world-object-"] rule
+   above) -- these are still direct children of #original-game-container, and an id/class
+   starting with "world-object-" would match that higher-specificity rule and force them
+   permanently hidden (display:none, z-index:1) regardless of this class's own rules. */
+.pond-lolligator-basker {
+    display: none;
+    position: absolute;
+    /* lolligator.png is now the full-body swimming crocodile (477x152, ~3.14 w/h) rather
+       than the earlier cropped snout-only sprite (~1.84 w/h) -- width/height and the
+       centering margins were retuned to match. */
+    width: 62px;
+    height: 20px;
+    margin-left: -31px;
+    margin-top: -14px;
+    background-image: url('../images/places/lollipopFarm/lolligator.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    pointer-events: none;
+    z-index: 2;
+}
+body[data-place="LollipopFarm"] .pond-lolligator-basker {
+    display: block;
+}
+
+/* Painted, static field/crop-rows backdrop for the LollipopFarm's planting UI --
+   "statikus diszlet, mint a kut/malom" (user's explicit scope choice): unlike the Mill/Pond,
+   there's no dedicated ascii art for the field to hook a spanClass onto (drawFieldStuff only
+   draws the "Lollipops planted"/buttons/production TEXT, not a crop-row graphic), and the
+   planting mechanic itself has no separate "unlocked" flag gating the whole feature the way
+   the Mill/Pond do -- so this follows the Well's pattern instead: unconditionally visible
+   once on the LollipopFarm place, not gated by :has(.someArt). Sized/positioned as a wide
+   ground band sitting just below the painted pond (pond bottom edge measured live at
+   top:193+height:233=426px) and behind the planting text/buttons (which start around
+   top:432px), using background-size:cover since field.png's own aspect (792x630, ~1.26 w/h)
+   is much taller than the ~160px of vertical room available there. */
+/* "Frame every image separately" -- three stacked background chambers behind the Mill/
+   Pond/Field regions, so the page reads as distinct zones instead of one continuous ascii
+   wash (the specific bug this followed -- the field image bleeding over the planting
+   buttons -- is already fixed via z-index/position above; this is the follow-up ask to make
+   the whole page visually legible, not another overlap fix).
+   Deliberately does NOT touch any button/text position (drawFieldStuff/drawMillStuff/
+   drawPondStuff's own x,y coordinates) -- that's the riskier "real flow-layout cards"
+   version we explicitly chose NOT to do this round. These are just z-index:-1 tinted
+   washes sitting behind everything else (painted images included), each keyed to that
+   region's own accent color (cyan/obsidian for the Mill, matching the teal Pond palette,
+   and a purple/earthy tone picking up field.png's own lollipop-stalk color) so the eye can
+   tell the three "rooms" apart at a glance. Bands are horizontal, not a 2-column grid,
+   because the real content doesn't split cleanly left/right: the Feed Mill button and the
+   Buy A Lolligator button both sit roughly centered across the full width in the live ascii
+   grid, not confined to one side. */
+body[data-place="LollipopFarm"] #world-object-millCard {
+    display: block;
+    left: -8px;
+    right: -8px;
+    top: -16px;
+    height: 209px;
+    background: linear-gradient(180deg, rgba(20, 26, 34, 0.55) 0%, rgba(10, 14, 20, 0.35) 100%);
+    border-bottom: 1px solid rgba(0, 229, 255, 0.15);
+    z-index: -1;
+    pointer-events: none;
+}
+body[data-place="LollipopFarm"] #world-object-pondCard {
+    display: block;
+    left: -8px;
+    right: -8px;
+    top: 193px;
+    height: 227px;
+    background: linear-gradient(180deg, rgba(10, 30, 32, 0.4) 0%, rgba(6, 20, 24, 0.5) 100%);
+    border-top: 1px solid rgba(64, 224, 208, 0.15);
+    border-bottom: 1px solid rgba(64, 224, 208, 0.15);
+    z-index: -1;
+    pointer-events: none;
+}
+body[data-place="LollipopFarm"] #world-object-fieldCard {
+    display: block;
+    left: -8px;
+    right: -8px;
+    top: 420px;
+    bottom: -8px;
+    background: linear-gradient(180deg, rgba(30, 16, 34, 0.4) 0%, rgba(16, 10, 20, 0.5) 100%);
+    border-top: 1px solid rgba(168, 96, 200, 0.18);
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* Painted field backdrop image was removed to prevent covering planting UI buttons/text */
+body[data-place="LollipopFarm"] #world-object-field {
+    display: none;
+}
+
+
+/* ==========================================================================
+   Start Game Modal Overlay
+   ========================================================================== */
+#start-game-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 20000;
+    background: rgba(4, 4, 7, 0.88);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+#start-game-modal-overlay.closing {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.start-game-modal-card {
+    position: relative;
+    max-width: 560px;
+    width: 100%;
+    background: linear-gradient(150deg, rgba(24, 18, 30, 0.96), rgba(10, 10, 16, 0.98));
+    border: 1px solid rgba(230, 197, 135, 0.3);
+    border-radius: 16px;
+    padding: 36px 32px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(255, 0, 85, 0.15), inset 0 0 25px rgba(230, 197, 135, 0.05);
+    text-align: center;
+    box-sizing: border-box;
+    animation: modalPopIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes modalPopIn {
+    0% {
+        transform: scale(0.92) translateY(12px);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+    }
+}
+
+.start-game-brand {
+    margin-bottom: 24px;
+}
+
+.start-game-badge {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: #ff0055;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 10px;
+    display: inline-block;
+    padding: 5px 14px;
+    border-radius: 999px;
+    background: rgba(255, 0, 85, 0.1);
+    border: 1px solid rgba(255, 0, 85, 0.3);
+}
+
+.start-game-title {
+    font-family: 'Cinzel', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 8px 0 6px 0;
+    letter-spacing: 1.5px;
+    text-shadow: 0 0 16px rgba(255, 255, 255, 0.2);
+}
+
+.start-game-subtitle {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    color: #a09fa5;
+    margin: 0;
+}
+
+.start-game-save-panel {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 22px;
+    text-align: left;
+    transition: border-color 0.2s ease;
+}
+
+.start-game-save-panel:hover {
+    border-color: rgba(230, 197, 135, 0.3);
+}
+
+.start-game-save-icon {
+    font-size: 30px;
+    color: #e6c587;
+    filter: drop-shadow(0 0 8px rgba(230, 197, 135, 0.5));
+    line-height: 1;
+}
+
+.start-game-save-info {
+    flex: 1;
+}
+
+.start-game-save-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.start-game-save-title {
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    color: #e6c587;
+}
+
+.start-game-save-title strong {
+    color: #fff;
+}
+
+.start-game-save-date {
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    color: #777;
+}
+
+.start-game-save-stats {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.stat-pill {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+}
+
+.candy-pill {
+    background: rgba(255, 0, 85, 0.12);
+    color: #ff5588;
+    border: 1px solid rgba(255, 0, 85, 0.3);
+}
+
+.lolly-pill {
+    background: rgba(0, 229, 255, 0.12);
+    color: #00e5ff;
+    border: 1px solid rgba(0, 229, 255, 0.3);
+}
+
+.start-game-empty-panel {
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 22px;
+    color: #a09fa5;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.start-game-empty-icon {
+    font-size: 18px;
+    color: #00e5ff;
+}
+
+.start-game-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.start-game-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 22px;
+    border-radius: 12px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid transparent;
+    outline: none;
+    user-select: none;
+}
+
+.start-game-btn-continue {
+    background: linear-gradient(135deg, rgba(230, 197, 135, 0.22), rgba(255, 0, 85, 0.16));
+    border-color: rgba(230, 197, 135, 0.45);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(230, 197, 135, 0.15);
+}
+
+.start-game-btn-continue:hover {
+    background: linear-gradient(135deg, rgba(230, 197, 135, 0.35), rgba(255, 0, 85, 0.28));
+    border-color: #e6c587;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(230, 197, 135, 0.35), 0 0 20px rgba(255, 0, 85, 0.25);
+}
+
+.start-game-btn-continue .sg-btn-icon {
+    font-size: 20px;
+    color: #e6c587;
+    text-shadow: 0 0 10px rgba(230, 197, 135, 0.8);
+}
+
+.start-game-btn-continue .sg-btn-main {
+    font-family: 'Cinzel', serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 1.5px;
+    display: block;
+}
+
+.start-game-btn-continue .sg-btn-sub {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    color: #e6c587;
+    display: block;
+    margin-top: 3px;
+}
+
+.start-game-btn-new {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.start-game-btn-new:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(0, 229, 255, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 229, 255, 0.2);
+}
+
+.start-game-btn-new .sg-btn-icon {
+    font-size: 20px;
+    color: #00e5ff;
+    text-shadow: 0 0 10px rgba(0, 229, 255, 0.8);
+}
+
+.start-game-btn-new .sg-btn-main {
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 1.2px;
+    display: block;
+}
+
+.start-game-btn-new .sg-btn-sub {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    color: #8c8b92;
+    display: block;
+    margin-top: 3px;
+}
+
+.start-game-other-slots-container {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.start-game-other-slots-title {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: #777;
+    margin-bottom: 10px;
+    text-align: left;
+}
+
+.start-game-slots-list {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.start-game-slot-chip {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #aaa;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.start-game-slot-chip:hover {
+    border-color: #e6c587;
+    color: #fff;
+    background: rgba(230, 197, 135, 0.1);
+}
+
+.start-game-slot-chip.selected {
+    border-color: #ff0055;
+    color: #fff;
+    background: rgba(255, 0, 85, 0.2);
+    box-shadow: 0 0 12px rgba(255, 0, 85, 0.4);
+}
+

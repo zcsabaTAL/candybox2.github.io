@@ -186,24 +186,30 @@ class LollipopFarm extends Place{
                 this.renderArea.drawString("Plant", x, y+2);
                 plantingButtonsXPos += 6;
                 // We add the button to plant 1
-                this.renderArea.addAsciiRealButton("1", x + plantingButtonsXPos, y+2, "lollipopFarmPlant1LollipopButton");
+                // "lollipopQuantityChip" (design.css) is a compact button style sized for
+                // these short numeric labels -- the default .asciiRealButton padding is too
+                // wide to fit in the tight ch-column budget these buttons get, which used to
+                // make them visibly overlap (verified live). The ch increments below were
+                // re-tuned to the chip's actual measured widths, not the original padding-free
+                // assumption.
+                this.renderArea.addAsciiRealButton("1", x + plantingButtonsXPos, y+2, "lollipopFarmPlant1LollipopButton lollipopQuantityChip");
                 this.renderArea.addLinkCall(".lollipopFarmPlant1LollipopButton", new CallbackCollection(this.plantLollipops.bind(this, 1)));
-                plantingButtonsXPos += 2;
+                plantingButtonsXPos += 4;
                 // We add the button to plant 10
-                this.renderArea.addAsciiRealButton("10", x + plantingButtonsXPos, y+2, "lollipopFarmPlant10LollipopsButton");
+                this.renderArea.addAsciiRealButton("10", x + plantingButtonsXPos, y+2, "lollipopFarmPlant10LollipopsButton lollipopQuantityChip");
                 this.renderArea.addLinkCall(".lollipopFarmPlant10LollipopsButton", new CallbackCollection(this.plantLollipops.bind(this, 10)));
-                plantingButtonsXPos += 3;
+                plantingButtonsXPos += 5;
                 // We possibly add the button to plant 100
                 if(Saving.loadBool("lollipopFarmPlant100LollipopsButtonUnlocked") == true){
-                    this.renderArea.addAsciiRealButton("100", x + plantingButtonsXPos, y+2, "lollipopFarmPlant100LollipopsButton");
+                    this.renderArea.addAsciiRealButton("100", x + plantingButtonsXPos, y+2, "lollipopFarmPlant100LollipopsButton lollipopQuantityChip");
                     this.renderArea.addLinkCall(".lollipopFarmPlant100LollipopsButton", new CallbackCollection(this.plantLollipops.bind(this, 100)));
-                    plantingButtonsXPos += 4;
+                    plantingButtonsXPos += 6;
                 }
                 // We possibly add the button to plant 100
                 if(Saving.loadBool("lollipopFarmPlant1000LollipopsButtonUnlocked") == true){
-                    this.renderArea.addAsciiRealButton("1000", x + plantingButtonsXPos, y+2, "lollipopFarmPlant1000LollipopsButton");
+                    this.renderArea.addAsciiRealButton("1000", x + plantingButtonsXPos, y+2, "lollipopFarmPlant1000LollipopsButton lollipopQuantityChip");
                     this.renderArea.addLinkCall(".lollipopFarmPlant1000LollipopsButton", new CallbackCollection(this.plantLollipops.bind(this, 1000)));
-                    plantingButtonsXPos += 5;
+                    plantingButtonsXPos += 7;
                 }
                 // We add the final text
                 this.renderArea.drawString("lollipops", x + plantingButtonsXPos, y+2);
@@ -252,9 +258,58 @@ class LollipopFarm extends Place{
         }
     }
     
+    // Fixed "flat rock" spots on the pond's shore (fractional x/y within the painted pond
+    // world-object's own box -- see #world-object-pond in design.css), used to place the
+    // sunbathing lolligators. Simpler and much more reliable than trying to mirror the
+    // ascii swim simulation's live position/count (that approach was tried and discarded --
+    // see PondLolligator.ts's history -- the fade-in/out made them barely ever visible).
+    private static LOLLIGATOR_BASKER_SPOTS: { x: number; y: number }[] = [
+        { x: 0.28, y: 0.24 },
+        { x: 0.62, y: 0.18 },
+        { x: 0.15, y: 0.55 },
+        { x: 0.25, y: 0.85 },
+        { x: 0.68, y: 0.82 },
+        { x: 0.85, y: 0.52 }
+    ];
+    
+    // Creates/removes/positions one painted "basker" div per owned lolligator (capped at
+    // LOLLIGATOR_BASKER_SPOTS.length), sitting on the pond's shore. Called every time the
+    // farm redraws, so it reflects lollipopFarmPondHowManyLolligators as soon as it changes
+    // (e.g. right after buying one).
+    private syncLolligatorBaskers(): void{
+        var container = document.getElementById("original-game-container");
+        var pond = document.getElementById("world-object-pond");
+        if(container == null || pond == null) return;
+        
+        var count = Saving.loadBool("lollipopFarmPondDug") == true? Math.min(Saving.loadNumber("lollipopFarmPondHowManyLolligators"), LollipopFarm.LOLLIGATOR_BASKER_SPOTS.length) : 0;
+        
+        for(var i = 0; i < LollipopFarm.LOLLIGATOR_BASKER_SPOTS.length; i++){
+            var id = "pond-lolligator-basker-" + i.toString();
+            var el = document.getElementById(id);
+            
+            if(i < count){
+                if(el == null){
+                    el = document.createElement("div");
+                    el.id = id;
+                    el.className = "pond-lolligator-basker";
+                    container.appendChild(el);
+                }
+                var spot = LollipopFarm.LOLLIGATOR_BASKER_SPOTS[i];
+                el.style.left = (pond.offsetLeft + spot.x * pond.offsetWidth).toString() + "px";
+                el.style.top = (pond.offsetTop + spot.y * pond.offsetHeight).toString() + "px";
+            }
+            else{
+                if(el != null && el.parentNode != null) el.parentNode.removeChild(el);
+            }
+        }
+    }
+    
     private drawPondStuff(x: number, y: number): void{
         // Y position used because some things need to be moved when the player uses a non-english language
         var yPos: number;
+        
+        // Keep the sunbathing lolligators in sync with the owned count every time this redraws.
+        this.syncLolligatorBaskers();
         
         // Button to dig the pond (show if the button is unlocked and the pond isn't constructed yet)
         if(Saving.loadBool("lollipopFarmDigPondButtonUnlocked") == true && Saving.loadBool("lollipopFarmPondDug") == false){
@@ -268,7 +323,9 @@ class LollipopFarm extends Place{
             yPos = y;
             
             // Draw the pond ascii art
-            this.renderArea.drawArray(Database.getAscii("places/lollipopFarm/pond"), x, yPos, new RenderTransparency(" "));
+            // spanClass ("pondArt") hides the ascii once the painted pond world-object is
+            // showing, same trick as the Well/Mill (see LollipopFarm.ts's drawMillStuff).
+            this.renderArea.drawArray(Database.getAscii("places/lollipopFarm/pond"), x, yPos, new RenderTransparency(" "), "pondArt");
             
             // Draw the lolligators
             yPos += 3;
@@ -440,7 +497,23 @@ class LollipopFarm extends Place{
         this.renderArea.resetAllButSize();
     
         // Draw the farm
-        this.renderArea.drawArray(Database.getAscii("places/lollipopFarm/lollipopFarm"), 0, 5);
+        // FIX (live-reported bug): this used to be a single drawArray call for the whole
+        // base scene. That base ascii (ascii/places/lollipopFarm/lollipopFarm.txt) turns out
+        // to contain its OWN drawn "field" box -- rows 10-26 (0-indexed) are the diagonal
+        // "#.#/#!#/#&#" crop-row pattern in a bordered box -- which is a completely separate
+        // thing from the painted field.png world-object added later. Since that whole call
+        // had no spanClass, there was no way to hide just that portion the way millArt/
+        // pondArt already do for the Mill/Pond's own leftover ascii -- so once the painted
+        // field image was added, the diagonal ascii pattern kept rendering right through/
+        // next to it (reported live: "a cukorkamező most 2x van, egyszer karakter, egyszer
+        // kép"). Splitting the single call into three (unaffected rows before/after, plus
+        // the field-box rows 10-26 tagged "fieldTextArt") lets design.css hide exactly that
+        // slice, same pattern as .millArt/.pondArt above.
+        var farmAscii = Database.getAscii("places/lollipopFarm/lollipopFarm");
+        this.renderArea.drawArray(farmAscii.slice(0, 8), 0, 5, null, "barnArt");
+        this.renderArea.drawArray(farmAscii.slice(8, 10), 0, 5 + 8);
+        this.renderArea.drawArray(farmAscii.slice(10, 27), 0, 5 + 10, null, "fieldTextArt");
+        this.renderArea.drawArray(farmAscii.slice(27), 0, 5 + 27);
         
         // Draw the field stuff
         this.drawFieldStuff(1, 34);

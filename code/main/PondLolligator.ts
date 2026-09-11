@@ -41,7 +41,12 @@ class PondLolligator{
     
     // Public methods
     public draw(renderArea: RenderArea, x: number, y: number): void{
-        renderArea.drawArray(Database.getAscii("places/lollipopFarm/lolligator" + (this.isLeft? "Left":"Right") + (this.visibleType == PondLolligatorVisibleType.FULLY_VISIBLE? "Full":"Top")), x + this.x, y + this.pondLineIndex);
+        // spanClass ("lolligatorArt") hides the swimming ascii now that the pond has a
+        // painted background -- ascii glyphs swimming across the painted art looked visually
+        // mismatched (verified live), and the sunbathing lolligators on the bank (see
+        // LollipopFarm.ts's drawPondStuff/syncLolligatorBaskers) are the replacement, so this
+        // ascii is fully retired rather than shown alongside it.
+        renderArea.drawArray(Database.getAscii("places/lollipopFarm/lolligator" + (this.isLeft? "Left":"Right") + (this.visibleType == PondLolligatorVisibleType.FULLY_VISIBLE? "Full":"Top")), x + this.x, y + this.pondLineIndex, null, "lolligatorArt");
     }
     
     public move(): void{

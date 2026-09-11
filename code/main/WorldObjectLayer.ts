@@ -22,7 +22,18 @@ class WorldObjectLayer {
     // for none.
     private static OBJECTS: { id: string; motes: number }[] = [
         { id: "world-object-wishingwell", motes: 4 },
-        { id: "world-object-mill", motes: 3 }
+        { id: "world-object-mill", motes: 3 },
+        { id: "world-object-barn", motes: 0 },
+        { id: "world-object-pond", motes: 0 },
+        { id: "world-object-field", motes: 0 },
+        // Purely decorative background "chambers" behind the Mill/Pond/Field regions --
+        // see design.css's LollipopFarm card-band comment for why. No motes, no gating on
+        // any *Art spanClass (unlike the images above, these are always shown once on the
+        // page -- see the CSS's body[data-place="LollipopFarm"] selector, same idea as the
+        // Well's own #original-game-container::before backdrop card).
+        { id: "world-object-millCard", motes: 0 },
+        { id: "world-object-pondCard", motes: 0 },
+        { id: "world-object-fieldCard", motes: 0 }
     ];
 
     public static init(): void {
