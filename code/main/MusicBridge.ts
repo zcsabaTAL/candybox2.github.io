@@ -27,6 +27,15 @@ class MusicBridge {
         "Cauldron": "music/places/sorceressHut.mp3",
         "Lighthouse": "music/places/lighthouse.mp3",
         "Desert": "music/places/desert.mp3",
+        // The Pier itself and jumping into the water off it (TheSea) share one theme, since
+        // they're really the same moment continuing.
+        "Pier": "music/places/theSea.mp3",
+        "TheSea": "music/places/theSea.mp3",
+        "TheCave": "music/places/theCave.mp3",
+        // These two are specific boss encounters (each is its own Quest subclass), so they get
+        // their own theme instead of falling back to the generic fight track.
+        "MonkeyWizardQuest": "music/places/monkeyWizardQuest.mp3",
+        "OctopusKingQuest": "music/places/octopusKingQuest.mp3",
         // Inventory / Save / Settings (Cfg) are menu-like screens rather than "places" with their
         // own atmosphere, so they all share one calmer, out-of-the-action theme.
         "Inventory": "music/menus.mp3",
@@ -52,6 +61,7 @@ class MusicBridge {
     // doesn't move the slider, it just silences playback until unmuted.
     private static sliderVolume: number = 0.45;
     private static muted: boolean = false;
+    private static isDucked: boolean = false;
     private static fadeTimer: any = null;
 
     // Autoplay gating: until the user has interacted with the page once, we just remember what
@@ -143,8 +153,15 @@ class MusicBridge {
         return MusicBridge.audioA !== null;
     }
 
+    public static setDucked(ducked: boolean): void {
+        MusicBridge.isDucked = ducked;
+        MusicBridge.applyVolumeToActiveTrack();
+    }
+
     private static effectiveVolume(): number {
-        return MusicBridge.muted ? 0 : MusicBridge.sliderVolume;
+        var vol: number = MusicBridge.muted ? 0 : MusicBridge.sliderVolume;
+        if (MusicBridge.isDucked) vol *= 0.35;
+        return vol;
     }
 
     // Applies the current effective volume to whichever track is actually audible right now,
