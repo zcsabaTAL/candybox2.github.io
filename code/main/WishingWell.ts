@@ -50,6 +50,11 @@ class WishingWell extends Place{
         return this.renderArea;
     }
     
+    // willStopBeingDisplayed
+    public willStopBeingDisplayed(): void{
+        VoiceBridge.stop();
+    }
+    
     // Private methods
     private addEnchantmentIfPossible(enchantment: Enchantment): void{
         if(enchantment.isPossible())
@@ -74,6 +79,7 @@ class WishingWell extends Place{
         
         // Set the speech
         this.currentSpeech = "wishingWellGiftDoneSpeech";
+        VoiceBridge.playWishingWellEvent(this.currentSpeech);
         
         // Re calc max hp
         this.getGame().getPlayer().reCalcMaxHp();
@@ -208,6 +214,7 @@ class WishingWell extends Place{
         
         // Set the speech
         this.currentSpeech = "wishingWellEnchantmentDoneSpeech";
+        VoiceBridge.playWishingWellEvent(this.currentSpeech);
         
         // Update
         this.update();
@@ -270,6 +277,7 @@ class WishingWell extends Place{
                 this.getGame().getPlayer().setHp(this.getGame().getPlayer().getMaxHp());
                 // Set the speech
                 this.currentSpeech = "wishingWellThrewCandiesSpeech";
+                VoiceBridge.playWishingWellEvent(this.currentSpeech);
                 // Set the next price
                 Saving.saveNumber("wishingWellCurrentCandyWishPrice", Saving.loadNumber("wishingWellPreviousCandyWishPrice")*2 + Saving.loadNumber("wishingWellCurrentCandyWishPrice")*2);
                 Saving.saveNumber("wishingWellPreviousCandyWishPrice", oldPrice);
@@ -278,6 +286,7 @@ class WishingWell extends Place{
             else{
                 // Set the speech
                 this.currentSpeech = "wishingWellNoWoundSpeech";
+                VoiceBridge.playWishingWellEvent(this.currentSpeech);
             }
             // Update
             this.update();
@@ -294,6 +303,7 @@ class WishingWell extends Place{
                 this.currentSpeech = "wishingWellChocolateBarIntroductionSpeech";
             else
                 this.currentSpeech = "wishingWellThrewChocolateBarSpeech";
+            VoiceBridge.playWishingWellEvent(this.currentSpeech);
             // Increase the number of chocolate bars thrown
             Saving.saveNumber("wishingWellHowManyChocolateBarsThrown", Saving.loadNumber("wishingWellHowManyChocolateBarsThrown") + 1)
             // We are now enchanting
@@ -308,6 +318,7 @@ class WishingWell extends Place{
         if(this.getGame().getCandies().getCurrent() >= 1){
             this.getGame().getCandies().add(-1); // We use one candy
             this.currentSpeech = "wishingWellCandyIntroductionSpeech"; // Set the speech
+            VoiceBridge.playWishingWellEvent(this.currentSpeech);
             Saving.saveBool("wishingWellFirstCandyThrown", true); // Change the bool
             this.update();
             this.getGame().updatePlace();
@@ -318,6 +329,7 @@ class WishingWell extends Place{
         if(this.getGame().getLollipops().getCurrent() >= 1){
             this.getGame().getLollipops().add(-1); // We use one lollipop
             this.currentSpeech = "wishingWellLollipopIntroductionSpeech"; // Set the speech
+            VoiceBridge.playWishingWellEvent(this.currentSpeech);
             Saving.saveBool("wishingWellFirstLollipopThrown", true); // Change the bool
             this.update();
             this.getGame().updatePlace();
@@ -333,6 +345,7 @@ class WishingWell extends Place{
             this.getGame().getCandies().add(Math.ceil(Saving.loadNumber("wishingWellCurrentLollipopWishPrice")/2));
             // Set the speech
             this.currentSpeech = "wishingWellThrewLollipopsSpeech";
+            VoiceBridge.playWishingWellEvent(this.currentSpeech);
             // Set the next price
             Saving.saveNumber("wishingWellCurrentLollipopWishPrice", Saving.loadNumber("wishingWellCurrentLollipopWishPrice")*10)
             // Update
@@ -350,6 +363,7 @@ class WishingWell extends Place{
                 this.currentSpeech = "wishingWellPainAuChocolatIntroductionSpeech";
             else
                 this.currentSpeech = "wishingWellThrewPainAuChocolatSpeech";
+            VoiceBridge.playWishingWellEvent(this.currentSpeech);
             // Increase the number of pains au chocolat thrown
             Saving.saveNumber("wishingWellHowManyPainsAuChocolatThrown", Saving.loadNumber("wishingWellHowManyPainsAuChocolatThrown") + 1)
             // We are now pain au chocolating

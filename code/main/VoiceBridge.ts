@@ -20,6 +20,11 @@ class VoiceBridge {
         VoiceBridge.playSingle(dragonFile);
     }
 
+    public static playWishingWellEvent(speechId: string): void {
+        var wellFile: string = "audio/voice/wishing_well/" + speechId + ".mp3";
+        VoiceBridge.playSingle(wellFile);
+    }
+
     public static playDialogue(playerTrack: string, responderTrack: string): void {
         VoiceBridge.stop();
 
