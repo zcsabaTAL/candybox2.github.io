@@ -80,6 +80,12 @@ module Main{
         }
     }
     
+    export function bootGame(type: MainLoadingType, str: string): void{
+        loadingType = type;
+        loadingString = str;
+        documentIsReady();
+    }
+
     function start(): void{
         game = new Game(gameMode);
         Keyboard.setGame(game);
@@ -106,6 +112,10 @@ $(document).ready(function(){
     if (typeof MusicVolumeUI !== "undefined") MusicVolumeUI.init();
 
     Main.setUrlData(window.location.search);
-    Main.autoResumeLastSlotIfNoUrlData();
-    Main.documentIsReady();
+    if (typeof StartGameModal !== "undefined") {
+        StartGameModal.init();
+    } else {
+        Main.autoResumeLastSlotIfNoUrlData();
+        Main.documentIsReady();
+    }
 });

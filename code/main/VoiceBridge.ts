@@ -25,6 +25,11 @@ class VoiceBridge {
         VoiceBridge.playSingle(wellFile);
     }
 
+    public static playBlacksmithEvent(speechId: string): void {
+        var blacksmithFile: string = "audio/voice/blacksmith/" + speechId + ".wav";
+        VoiceBridge.playSingle(blacksmithFile);
+    }
+
     public static playDialogue(playerTrack: string, responderTrack: string): void {
         VoiceBridge.stop();
 

@@ -42,11 +42,17 @@ class Forge extends House{
         
         this.renderArea.resizeFromArray(Database.getAscii("places/village/forge"), 0, 3);
         this.update();
+        VoiceBridge.playBlacksmithEvent(this.currentSpeech);
     }
     
     // getRenderArea()
     public getRenderArea(): RenderArea{
         return this.renderArea;
+    }
+    
+    // willStopBeingDisplayed
+    public willStopBeingDisplayed(): void{
+        VoiceBridge.stop();
     }
     
     // Private methods
@@ -56,6 +62,7 @@ class Forge extends House{
             Saving.saveBool("forgeBoughtIronAxe", true); // We bought the axe
             this.getGame().gainItem("eqItemWeaponIronAxe"); // We now own the axe
             this.currentSpeech = "mapVillageForgeBuyIronAxeSpeech"; // New speech
+            VoiceBridge.playBlacksmithEvent(this.currentSpeech);
             // We update
             this.update();
             this.getGame().updatePlace();
@@ -68,6 +75,7 @@ class Forge extends House{
             Saving.saveBool("forgeBoughtLightweightBodyArmour", true); // We bought the armour
             this.getGame().gainItem("eqItemBodyArmoursLightweightBodyArmour"); // We now own the armour
             this.currentSpeech = "mapVillageForgeBuyLightweightBodyArmourSpeech"; // New speech
+            VoiceBridge.playBlacksmithEvent(this.currentSpeech);
             // We update
             this.update();
             this.getGame().updatePlace();
@@ -80,6 +88,7 @@ class Forge extends House{
             Saving.saveBool("forgeBoughtPolishedSilverSword", true); // We bought the sword
             this.getGame().gainItem("eqItemWeaponPolishedSilverSword"); // We now own the sword
             this.currentSpeech = "mapVillageForgeBuyPolishedSilverSwordSpeech"; // New speech
+            VoiceBridge.playBlacksmithEvent(this.currentSpeech);
             // We update
             this.update();
             this.getGame().updatePlace();
@@ -92,6 +101,7 @@ class Forge extends House{
             Saving.saveBool("forgeBoughtScythe", true); // We bought the scythe
             this.getGame().gainItem("eqItemWeaponScythe"); // We now own the scythe
             this.currentSpeech = "mapVillageForgeBuyScytheSpeech"; // New speech
+            VoiceBridge.playBlacksmithEvent(this.currentSpeech);
             // We update
             this.update();
             this.getGame().updatePlace();
@@ -104,6 +114,7 @@ class Forge extends House{
             Saving.saveBool("forgeBoughtWoodenSword", true); // We bought the sword
             this.getGame().gainItem("eqItemWeaponWoodenSword"); // We now own the sword
             this.currentSpeech = "mapVillageForgeBuyWoodenSwordSpeech"; // New speech
+            VoiceBridge.playBlacksmithEvent(this.currentSpeech);
             Saving.saveBool("statusBarUnlockedInventory", true); // We unlock the inventory
             this.getGame().updateStatusBar(true); // We update the status bar
             this.getGame().getStatusBar().selectTabByType(StatusBarTabType.MAP); // We re-select the map tab (because adding the inventory tab created a gap in tab selection..)

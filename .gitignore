@@ -5,3 +5,7 @@
 /candybox2.js
 /candybox2_uncompressed.js
 /code/gen/
+node_modules/
+_to_delete/
+audio/test/
+ux_redesign_assets/

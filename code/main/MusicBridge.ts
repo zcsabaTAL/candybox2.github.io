@@ -21,6 +21,7 @@ class MusicBridge {
     // (if the place is a Quest, i.e. a combat/exploration screen) or the main theme otherwise.
     private static PLACE_TRACKS: any = {
         "Village": "music/places/village.mp3",
+        "Forge": "music/places/forge.mp3",
         "SorceressHut": "music/places/sorceressHut.mp3",
         // The Cauldron is the witch's own workspace (reached from her hut), so it shares her
         // theme rather than getting a separate track.
@@ -44,7 +45,18 @@ class MusicBridge {
     };
 
     private static MAIN_THEME: string = "music/main-theme.mp3";
+    private static CALM_THEME: string = "music/where-the-clock-stops.mp3";
+    private static MEDITATIVE_THEME: string = "music/a-room-without-hours.mp3";
     private static FIGHT_THEME: string = "music/fight.mp3";
+
+    private static GENERAL_TRACKS: any = [
+        "music/main-theme.mp3",
+        "music/where-the-clock-stops.mp3",
+        "music/a-room-without-hours.mp3"
+    ];
+
+    private static currentPlaceName: string = null;
+    private static currentIsQuest: boolean = false;
 
     private static VOLUME_STORAGE_KEY: string = "musicBridgeVolume"; // 0-100
     private static MUTED_STORAGE_KEY: string = "musicBridgeMuted"; // "1" or "0"
@@ -71,6 +83,36 @@ class MusicBridge {
     private static pendingIsQuest: boolean = false;
     private static hasPending: boolean = false;
 
+    private static isGeneralTrack(track: string): boolean {
+        if (!track) return false;
+        for (var i = 0; i < MusicBridge.GENERAL_TRACKS.length; i++) {
+            if (track.indexOf(MusicBridge.GENERAL_TRACKS[i]) !== -1) return true;
+        }
+        return false;
+    }
+
+    private static isCurrentAreaGeneral(): boolean {
+        if (MusicBridge.currentIsQuest) return false;
+        if (!MusicBridge.currentPlaceName) return true;
+        var placeTrack: string = MusicBridge.PLACE_TRACKS[MusicBridge.currentPlaceName];
+        return !placeTrack;
+    }
+
+    // Weighted random selection:
+    // 50% Main theme (music/main-theme.mp3)
+    // 40% Where the Clock Stops (music/where-the-clock-stops.mp3)
+    // 10% A Room Without Hours (music/a-room-without-hours.mp3)
+    private static pickGeneralTrack(): string {
+        var r: number = Math.random();
+        if (r < 0.50) {
+            return MusicBridge.MAIN_THEME;
+        } else if (r < 0.90) {
+            return MusicBridge.CALM_THEME;
+        } else {
+            return MusicBridge.MEDITATIVE_THEME;
+        }
+    }
+
     public static init(): void {
         if (MusicBridge.audioA !== null) return; // Already initialized
 
@@ -96,8 +138,21 @@ class MusicBridge {
     // to fall back to the fight theme (true) or the main theme (false) when there's no
     // place-specific track.
     public static setPlace(placeName: string, isQuest: boolean): void {
+        MusicBridge.currentPlaceName = placeName;
+        MusicBridge.currentIsQuest = isQuest;
+
         var track: string = MusicBridge.PLACE_TRACKS[placeName];
-        if (!track) track = isQuest ? MusicBridge.FIGHT_THEME : MusicBridge.MAIN_THEME;
+        if (!track) {
+            if (isQuest) {
+                track = MusicBridge.FIGHT_THEME;
+            } else {
+                // If we are already playing one of the general themes, don't restart or crossfade!
+                if (MusicBridge.isGeneralTrack(MusicBridge.currentTrack)) {
+                    return;
+                }
+                track = MusicBridge.pickGeneralTrack();
+            }
+        }
 
         if (track === MusicBridge.currentTrack) return; // Already playing (or about to play) this track
 
@@ -109,6 +164,10 @@ class MusicBridge {
             return;
         }
 
+        MusicBridge.startTrack(track);
+    }
+
+    private static startTrack(track: string): void {
         MusicBridge.currentTrack = track;
 
         var incoming: HTMLAudioElement = MusicBridge.activeIsA ? MusicBridge.audioB : MusicBridge.audioA;
@@ -116,9 +175,17 @@ class MusicBridge {
         MusicBridge.activeIsA = !MusicBridge.activeIsA;
 
         incoming.src = track;
+        // Place and combat tracks loop; general ambient tracks don't loop so they can naturally rotate
+        incoming.loop = !MusicBridge.isGeneralTrack(track);
         incoming.volume = 0;
         incoming.currentTime = 0;
-        try { incoming.play(); } catch (e) { /* Ignore -- e.g. browser still withholding autoplay */ }
+
+        try {
+            var p: any = incoming.play();
+            if (p && p.catch) {
+                p.catch(function (err: any): void { /* Ignore -- browser withholding autoplay */ });
+            }
+        } catch (e) { /* Ignore */ }
 
         MusicBridge.crossfade(incoming, outgoing);
     }
@@ -197,8 +264,20 @@ class MusicBridge {
         var el: HTMLAudioElement = <HTMLAudioElement>document.createElement("audio");
         el.loop = true;
         el.volume = 0;
+        el.addEventListener("ended", function (): void {
+            MusicBridge.handleTrackEnded(el);
+        });
         document.body.appendChild(el);
         return el;
+    }
+
+    private static handleTrackEnded(el: HTMLAudioElement): void {
+        var active: HTMLAudioElement = MusicBridge.activeIsA ? MusicBridge.audioA : MusicBridge.audioB;
+        if (el !== active) return;
+        if (!MusicBridge.isCurrentAreaGeneral()) return;
+
+        var nextTrack: string = MusicBridge.pickGeneralTrack();
+        MusicBridge.startTrack(nextTrack);
     }
 
     private static crossfade(incoming: HTMLAudioElement, outgoing: HTMLAudioElement): void {
