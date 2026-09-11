@@ -101,6 +101,7 @@ $(document).ready(function(){
     // up immediately.
     if (typeof AsciiGroupHover !== "undefined") AsciiGroupHover.init();
     if (typeof PlaceAmbience !== "undefined") PlaceAmbience.init();
+    if (typeof WorldObjectLayer !== "undefined") WorldObjectLayer.init();
     if (typeof MusicBridge !== "undefined") MusicBridge.init();
     if (typeof MusicVolumeUI !== "undefined") MusicVolumeUI.init();
 

@@ -368,7 +368,14 @@ class WishingWell extends Place{
         this.addBackToMainMapButton(this.renderArea, "wishingWellBackToTheMapButton");
         
         // Draw the well
-        this.renderArea.drawArray(Database.getAscii("places/wishingWell"), 38, 3);
+        // spanClass wraps every row of this drawing in its own <span class="wishingWellArt">
+        // (see RenderArea.drawArray) -- design.css hides that class outright once the place
+        // has painted art (see WorldObjectLayer.ts's #world-object-wishingwell), so the ascii
+        // lines never show through/around the image regardless of exactly how big or where
+        // that image is sized -- much more robust than trying to size an opaque image to
+        // pixel-perfectly cover a guessed ascii bounding box (which is what the first version
+        // of this did, and it undershot, leaving ascii visible around the edges).
+        this.renderArea.drawArray(Database.getAscii("places/wishingWell"), 38, 3, null, "wishingWellArt");
         
         // Draw the speech if currentSpeech isn't null
         if(this.currentSpeech != null){
