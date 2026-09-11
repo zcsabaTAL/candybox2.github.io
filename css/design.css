@@ -923,6 +923,179 @@ body[data-place="MainMap"] .ascii-poi-marker-active {
     50% { box-shadow: 0 0 22px 8px rgba(224, 164, 88, 0.85); }
 }
 
+/* --------------------------------------------------------------------------------------
+   Painted "world objects" (see WorldObjectLayer.ts) -- step one of gradually replacing
+   individual ascii set pieces with actual painted art, one place at a time. Each object is
+   a div created once at startup and left in the DOM for good; this is the only place that
+   ever positions or shows it -- WorldObjectLayer.ts never touches these elements after
+   creating them. Positioned in "ch"/"em" units (character-width/line-height, same idea as
+   the "ex" units RenderArea.ts already uses for select widths) so it tracks the WishingWell
+   font-size like everything else on the screen, rather than a hardcoded pixel box that
+   would drift out of place if that place's font-size ever changes.
+   It sits behind the real buttons/select (both position:absolute already, and both defined
+   with their own explicit background/color rather than inheriting from the ascii grid --
+   see .asciiRealButton/.asciiSelect above), so nothing about their function changes: this
+   purely covers the ascii well drawing underneath with the painted equivalent. Hidden by
+   default; each place that has painted art turns its own object on below. */
+#original-game-container > [id^="world-object-"] {
+    display: none;
+    position: absolute;
+    background-repeat: no-repeat;
+    background-position: top center;
+    background-size: contain;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* The ascii well art (places/wishingWell.txt) is drawn at column 38, row 3, and is 37
+   columns wide by ~30 rows tall -- see WishingWell.ts's update()/constructor. This box is
+   sized a little generously around that so no ascii edge peeks out. */
+body[data-place="WishingWell"] #world-object-wishingwell {
+    display: block;
+    left: 36ch;
+    top: 2.4em;
+    width: 40ch;
+    height: 37.2em;
+    background-image: url('../images/places/wishingWell.png');
+    /* Edge bleed: the source image is a hard-edged rectangle (painted scene on flat black),
+       which reads as a pasted-in sticker against the page's own near-black background. A
+       radial mask feathers that rectangle into a soft oval, so the two blacks blend instead
+       of meeting at a visible seam. -webkit- prefix because mask-image still needs it in
+       Safari/older Chromium; unprefixed is the standard property. */
+    mask-image: radial-gradient(ellipse at center, black 60%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse at center, black 60%, transparent 100%);
+}
+
+/* Ground shadow: a soft, blurred dark patch under the object to give it some weight/depth
+   instead of just floating on the page. A pseudo-element on the object itself (rather than a
+   separate DOM node from WorldObjectLayer.ts) so it moves/scales with the object for free and
+   needs no extra JS. Sits behind the artwork (z-index -1) and is allowed to spill past the
+   object's own box (its parent isn't clipped), so the blur has room to fall off naturally. */
+body[data-place="WishingWell"] #world-object-wishingwell::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 2%;
+    width: 65%;
+    height: 10%;
+    transform: translateX(-50%);
+    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 72%);
+    filter: blur(12px);
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* Ether motes: tiny cyan/purple sparks drifting up out of the well's mouth and fading as
+   they rise, on an endless loop. Same idea as PlaceAmbience.ts's embers (create once, loop
+   forever with staggered timing so they don't move in lockstep) but scoped to this one
+   object instead of the whole screen -- see WorldObjectLayer.ts, which appends these as
+   plain child spans; all the position/stagger is done here with nth-child rather than
+   per-span inline styles or JS randomization, since a handful of fixed offsets already
+   reads as "not synchronized" at this scale.
+   `bottom` values are rough guesses at the well's rim height within the object's box (art
+   is ~55-65% of the way down the source image) -- expect to retune these once you can see
+   it rendered, there's no way to measure that from here. */
+@keyframes worldObjectMoteRise {
+    0% { transform: translateY(0) scale(0.6); opacity: 0; }
+    15% { opacity: 0.85; }
+    75% { opacity: 0.5; }
+    100% { transform: translateY(-60px) scale(1); opacity: 0; }
+}
+
+.world-object-mote {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0, 229, 255, 0.95) 0%, rgba(155, 92, 246, 0.55) 55%, rgba(155, 92, 246, 0) 100%);
+    box-shadow: 0 0 6px 2px rgba(0, 229, 255, 0.55);
+    pointer-events: none;
+    animation-name: worldObjectMoteRise;
+    animation-timing-function: ease-in;
+    animation-iteration-count: infinite;
+}
+
+#world-object-wishingwell .world-object-mote:nth-child(1) { left: 42%; bottom: 42%; animation-delay: 0s;    animation-duration: 4.5s; }
+#world-object-wishingwell .world-object-mote:nth-child(2) { left: 48%; bottom: 40%; animation-delay: 1.2s;  animation-duration: 5.5s; }
+#world-object-wishingwell .world-object-mote:nth-child(3) { left: 53%; bottom: 43%; animation-delay: 2.4s;  animation-duration: 5s; }
+#world-object-wishingwell .world-object-mote:nth-child(4) { left: 58%; bottom: 41%; animation-delay: 3.3s;  animation-duration: 4.8s; }
+
+/* Hover aura: a pulsing cyan glow around the object's actual (masked, non-transparent)
+   silhouette -- drop-shadow traces alpha, not the box, so it follows the oval edge-bleed
+   mask from above rather than lighting up a hard rectangle. Needs pointer-events: auto to
+   override the shared "none" default set on every [id^="world-object-"] (that default
+   exists so a decorative object never intercepts clicks meant for what's under/behind it;
+   this object has nothing under it once its own ascii art is hidden, so enabling hover here
+   is safe). No cursor:pointer yet on purpose -- nothing is clickable here yet, and a pointer
+   cursor would promise an interaction that doesn't exist until the click-to-open-panel piece
+   is actually built. */
+@keyframes worldObjectAuraBreathe {
+    0%, 100% { filter: drop-shadow(0 0 16px rgba(0, 229, 255, 0.28)); }
+    50%      { filter: drop-shadow(0 0 30px rgba(0, 229, 255, 0.5)); }
+}
+
+body[data-place="WishingWell"] #world-object-wishingwell {
+    pointer-events: auto;
+}
+
+body[data-place="WishingWell"] #world-object-wishingwell:hover {
+    animation: worldObjectAuraBreathe 2.2s ease-in-out infinite;
+}
+
+/* Feedback ripple: a pulsing cyan ring at the well's rim, shown for as long as the well has
+   an active response on screen (i.e. right after a throw -- see WishingWell.ts's
+   `currentSpeech`, which is only ever non-null after throwCandies/throwLollipops/etc, and
+   whose <span class="wishingWellSpeech"> is a freshly created DOM node each time since
+   update() wipes and rebuilds the whole render area). :has() lets the ripple react to that
+   without any JS or engine changes: #original-game-container is the nearest common ancestor
+   of the speech span (inside #mainContent) and this object (a sibling of #mainContent), so
+   "does a .wishingWellSpeech exist anywhere in here right now" is enough to gate it.
+   This is a continuous pulse for as long as a response is showing, not a one-shot flash
+   timed exactly to the click -- a precise single flash would need an actual JS hook into
+   WishingWell.ts's throw methods, which is doable if you want it snappier than this. */
+@keyframes worldObjectRipple {
+    0%   { opacity: 0;   transform: translateX(-50%) scale(0.6); }
+    30%  { opacity: 0.8; }
+    100% { opacity: 0;   transform: translateX(-50%) scale(1.7); }
+}
+
+#original-game-container:has(.wishingWellSpeech) #world-object-wishingwell::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 40%;
+    width: 30%;
+    height: 6%;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: radial-gradient(ellipse at center, rgba(0, 229, 255, 0.55) 0%, rgba(0, 229, 255, 0) 70%);
+    animation: worldObjectRipple 1.8s ease-out infinite;
+    pointer-events: none;
+}
+
+/* The ascii well drawing itself (see WishingWell.ts's update(), which now passes this as
+   drawArray's spanClass) -- hidden outright rather than relying on the painted image above
+   to visually cover it. visibility (not display/color) so the characters still occupy their
+   normal space in the grid -- nothing else's positioning shifts, this is purely cosmetic. */
+body[data-place="WishingWell"] .wishingWellArt {
+    visibility: hidden;
+}
+
+/* Lighthouse and LollipopFarm both draw a lot of ascii content (Lighthouse's tall tower art
+   plus its dialogue/puzzle panel; LollipopFarm's farm + mill + pond, stacked one under another)
+   at the same 1em/16px size as everything else, which -- unlike a quest's fixed viewport --
+   was never capped to fit any particular height. The page just grows to whatever the content
+   needs and scrolls, but on these two screens that means several hundred extra pixels of
+   scrolling before you reach the ask button / pond controls. Shrinking the ascii grid's font
+   size is safe here (buttons, selects and text inputs are all positioned in "ex"/character
+   units relative to this same element -- see RenderArea.ts's addList/addAsciiRealButton --
+   so the whole layout rescales together, nothing drifts out of alignment) and meaningfully
+   cuts down the scroll without making the art illegible. */
+body[data-place="Lighthouse"] #mainContent,
+body[data-place="LollipopFarm"] #mainContent {
+    font-size: 12px;
+}
+
 /* ------------------------------------------------------------
    Quest battle log ("quest-log-line" / "quest-log-line-count" /
    "quest-log-delimiter" -- see QuestLogMessage.ts and QuestLog.ts).
@@ -935,11 +1108,38 @@ body[data-place="MainMap"] .ascii-poi-marker-active {
    far)" counts picked out in a warmer accent, and the two delimiter
    rows turned from literal dashes into a soft gradient hairline.
    ------------------------------------------------------------ */
+/* Pins the *entire* battle log (both delimiter rows and every message row -- see
+   QuestLog.ts's single wrapping span) to a small, unobtrusive scrollable box instead of it
+   sitting inline as up to 12 full-width rows. It used to just dominate the screen -- worst on
+   the Forest quest once its viewport got narrower (see Forest.ts's camera), but really on every
+   quest -- pushing the actually important stuff (health, entities) further down the page than
+   necessary. Same corner-pill visual language as .quest-combat-hud-*, mirrored to the opposite
+   (bottom-right) corner so the two don't compete for the same space.
+   NOTE: content stays unwrapped (white-space: pre, inherited from #mainContent) because each
+   line's trailing "(NNN found so far)" is right-aligned using literal padding spaces baked into
+   the ascii grid -- wrapping would break that alignment. overflow-x covers the rare line that's
+   wider than the panel; overflow-y plus the capped height is what actually keeps it small,
+   scrolling to reveal older entries instead of pushing the page taller. */
+.quest-log-panel {
+    position: fixed !important;
+    z-index: 60;
+    right: calc(max(0px, (100vw - 1400px)/2) + 40px);
+    bottom: 20px;
+    max-width: min(420px, calc(100vw - 80px));
+    max-height: 130px;
+    overflow-y: auto;
+    overflow-x: auto;
+    padding: 8px 12px;
+    border-radius: 4px;
+    background: rgba(20, 20, 25, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 .quest-log-line {
     font-family: 'JetBrains Mono', 'Courier New', Courier, monospace;
-    font-size: 13px;
+    font-size: 11px;
     letter-spacing: 0.01em;
-    line-height: 1.7;
+    line-height: 1.4;
     color: rgba(210, 205, 198, 0.82);
 }
 
@@ -1032,3 +1232,37 @@ body[data-place="MainMap"] .quest-log-delimiter {
 .questPlayerSpellJumpButton { top: 438.4px; left: calc(max(0px, (100vw - 1400px)/2) + 174.4px); }
 .questPlayerSpellSqueezeButton { top: 438.4px; left: calc(max(0px, (100vw - 1400px)/2) + 232px); }
 .questPlayerSpell { top: 438.4px; left: calc(max(0px, (100vw - 1400px)/2) + 404.8px); }
+
+/* ------------------------------------------------------------
+   Combat HUD: the player's own HP and the HP of whichever hostile
+   entity is currently nearest them, always pinned to the bottom-left
+   corner of the screen -- unlike the entity health bars drawn inline
+   in the ascii grid (which naturally scroll with their entity and
+   disappear once it's off-screen), this stays visible and in a fixed,
+   predictable spot no matter how far the quest has scrolled.
+   ------------------------------------------------------------ */
+.quest-combat-hud-player, .quest-combat-hud-enemy {
+    position: fixed !important;
+    z-index: 70;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 8px 14px;
+    border-radius: 4px;
+    background: rgba(20, 20, 25, 0.85);
+    border: 1px solid rgba(255,255,255,0.15);
+    left: calc(max(0px, (100vw - 1400px)/2) + 40px);
+}
+
+.quest-combat-hud-player {
+    bottom: 64px;
+    color: #ff6b81;
+    border-color: rgba(255, 107, 129, 0.4);
+}
+
+.quest-combat-hud-enemy {
+    bottom: 20px;
+    color: #ffb84d;
+    border-color: rgba(255, 184, 77, 0.4);
+}
