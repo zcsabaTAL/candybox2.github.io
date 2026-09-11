@@ -506,11 +506,51 @@ class Quest extends Place{
         // Draw the player spells
         this.drawPlayerSpells();
         
+        // Draw the combat HUD (player HP + nearest enemy HP)
+        this.drawCombatHud();
+        
         // Draw the special instruction
         this.drawSpecialInstruction();
         
         // Draw the quest log
         this.drawQuestLog();
+    }
+    
+    // Always-visible corner HUD: the player's own HP, plus the HP of whichever hostile entity is
+    // currently closest to the player (a reasonable stand-in for "the one I'm fighting", since
+    // this game doesn't have an explicit combat-target concept). Drawn into the ascii grid like
+    // everything else, then pulled out to a fixed screen corner by design.css (see
+    // "quest-combat-hud-*") the same way the spell/potion buttons are -- so the grid row/column
+    // used here is arbitrary and only needs to not collide with other addTwoTags spans.
+    private drawCombatHud(): void{
+        var baseXPosition: number = ((this.renderArea.getWidth()-100) - this.getGap())/2;
+        var player: Player = this.getGame().getPlayer();
+        
+        // Player HP -- always shown while in a quest.
+        var playerHpText: string = "YOU: " + player.getHp() + " / " + player.getMaxHp();
+        this.renderArea.drawString(playerHpText, baseXPosition, 6);
+        this.renderArea.addTwoTags(baseXPosition, baseXPosition + playerHpText.length, 6, "<span class='quest-combat-hud-player'>", "</span>");
+        
+        // Nearest living hostile entity, by horizontal distance to the player.
+        var nearestEnemy: QuestEntity = null;
+        var nearestDistance: number = Number.MAX_VALUE;
+        for(var i = 0; i < this.getEntities().length; i++){
+            var entity: QuestEntity = this.getEntities()[i];
+            if(entity.getTeam() != player.getTeam() && entity.getDestructible() && !entity.getDead() && entity.getHp() > 0){
+                var distance: number = Math.abs(entity.getGlobalPosition().x - player.getGlobalPosition().x);
+                if(distance < nearestDistance){
+                    nearestDistance = distance;
+                    nearestEnemy = entity;
+                }
+            }
+        }
+        
+        if(nearestEnemy != null){
+            var enemyName: string = (nearestEnemy.getNaming() != null? nearestEnemy.getNaming().getBeginning() : "Enemy").toUpperCase();
+            var enemyHpText: string = enemyName + ": " + nearestEnemy.getHp() + " / " + nearestEnemy.getMaxHp();
+            this.renderArea.drawString(enemyHpText, baseXPosition, 7);
+            this.renderArea.addTwoTags(baseXPosition, baseXPosition + enemyHpText.length, 7, "<span class='quest-combat-hud-enemy'>", "</span>");
+        }
     }
     
     public drawEntities(): void{
