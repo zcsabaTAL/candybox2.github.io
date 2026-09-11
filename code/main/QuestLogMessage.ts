@@ -25,7 +25,14 @@ class QuestLogMessage{
         // "quest-log-delimiter" class -- see QuestLog.ts) a shared class so design.css can
         // restyle the whole battle log's typography/spacing without touching this ascii-grid
         // positioning logic at all.
-        if(this.left != null){
+        // Guard against an empty "left" (used by QuestLog.addDelimiter()'s blank spacer message):
+        // addTwoTags(x, x+0, ...) wraps a zero-width span, and RenderArea's tag-insertion order
+        // for two tags sharing one exact (x, y) turns that into a stray "</span><span ...>" --
+        // close before open -- which used to be harmless (nothing else was open there to
+        // accidentally close) but will eat an *enclosing* wrapper span, like QuestLog.ts's own
+        // "quest-log-panel". Skipping the wrap for an empty string changes nothing visually --
+        // there was never any text there to style.
+        if(this.left != null && this.left.length > 0){
             renderArea.drawString(this.left, pos.x, pos.y);
             renderArea.addTwoTags(pos.x, pos.x + this.left.length, pos.y, "<span class=\"quest-log-line\">", "</span>");
             if(this.bold) renderArea.addBold(pos.x, pos.x + this.left.length, pos.y);
