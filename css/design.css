@@ -949,21 +949,21 @@ body[data-place="MainMap"] .ascii-poi-marker-active {
 
 /* The ascii well art (places/wishingWell.txt) is drawn at column 38, row 3, and is 37
    columns wide by ~30 rows tall -- see WishingWell.ts's update()/constructor. This box is
-   sized a little generously around that so no ascii edge peeks out. */
+   sized a little generously around that so no ascii edge peeks out.
+   wishingWell.png is now a real cutout (genuine alpha channel around the well's own
+   silhouette, not a painted-on rectangle), so the old radial-gradient mask-image hack that
+   used to fake a soft edge on top of an opaque rectangle has been removed -- it would now
+   just clip the image's own already-correct edges with an unrelated oval. Height is 32.1em
+   instead of the old 37.2em to match this image's aspect ratio (276x443, ~0.623 w/h) at the
+   same 40ch width -- the old value was tuned for the previous (differently proportioned)
+   painted rectangle and would have stretched this one vertically. */
 body[data-place="WishingWell"] #world-object-wishingwell {
     display: block;
     left: 36ch;
     top: 2.4em;
     width: 40ch;
-    height: 37.2em;
+    height: 32.1em;
     background-image: url('../images/places/wishingWell.png');
-    /* Edge bleed: the source image is a hard-edged rectangle (painted scene on flat black),
-       which reads as a pasted-in sticker against the page's own near-black background. A
-       radial mask feathers that rectangle into a soft oval, so the two blacks blend instead
-       of meeting at a visible seam. -webkit- prefix because mask-image still needs it in
-       Safari/older Chromium; unprefixed is the standard property. */
-    mask-image: radial-gradient(ellipse at center, black 60%, transparent 100%);
-    -webkit-mask-image: radial-gradient(ellipse at center, black 60%, transparent 100%);
 }
 
 /* Ground shadow: a soft, blurred dark patch under the object to give it some weight/depth
@@ -1079,6 +1079,72 @@ body[data-place="WishingWell"] #world-object-wishingwell:hover {
    normal space in the grid -- nothing else's positioning shifts, this is purely cosmetic. */
 body[data-place="WishingWell"] .wishingWellArt {
     visibility: hidden;
+}
+
+/* Wishing Well control panel: THROW A CANDY / THROW 10 LOLLIPOPS / the enchantment
+   select+button (see WishingWell.ts's drawCandiesStuff/drawLollipopsStuff/
+   drawChocolateBarsStuff, all called from update() with x=0) live as loose absolutely
+   positioned buttons with no visual grouping, styled by the site-wide magenta
+   .asciiRealButton/.asciiSelect rules -- which reads fine everywhere else, but next to the
+   painted, cyan-toned well image it looks like two unrelated UIs glued together. This gives
+   the whole left-hand control column a single backdrop "card" and re-tints the buttons/select
+   to the well's own cyan/purple palette (the same rgba(0,229,255,...) used by the motes, hover
+   aura and ripple above), so the interactive chrome reads as part of the same magical object
+   instead of leftover default UI. Backdrop is a generated box (not a real DOM element) sized
+   in em to roughly bound the button column measured live (candy button top ~4.8em, enchant
+   button bottom ~25.7em, widest button ~17.5em) with margin -- decorative only, so it doesn't
+   need to track the grid pixel-for-pixel the way the well image itself does. z-index 0 keeps
+   it under the buttons (painted in DOM order after this pseudo-element) and under the well's
+   own world-object layer (z-index 1, see the shared [id^="world-object-"] rule above). */
+body[data-place="WishingWell"] #original-game-container::before {
+    content: "";
+    position: absolute;
+    left: -0.75em;
+    top: 3.5em;
+    width: 18.5em;
+    height: 23.5em;
+    border: 1px solid rgba(0, 229, 255, 0.2);
+    border-radius: 10px;
+    background: linear-gradient(180deg, rgba(15, 22, 32, 0.55) 0%, rgba(8, 12, 18, 0.4) 100%);
+    box-shadow: 0 0 25px rgba(0, 229, 255, 0.06) inset;
+    z-index: 0;
+    pointer-events: none;
+}
+
+body[data-place="WishingWell"] .asciiRealButton {
+    border-color: rgba(0, 229, 255, 0.3);
+    background: rgba(15, 22, 32, 0.7);
+}
+
+body[data-place="WishingWell"] .asciiRealButton:hover {
+    border-color: #00e5ff;
+    background: rgba(15, 35, 42, 0.85);
+    box-shadow: 0 0 15px rgba(0, 229, 255, 0.4), inset 0 0 10px rgba(0, 229, 255, 0.2);
+    color: #fff;
+}
+
+body[data-place="WishingWell"] .asciiSelect {
+    border-color: rgba(0, 229, 255, 0.3);
+    background: rgba(15, 22, 32, 0.7);
+}
+
+/* A faint divider between the "offerings" (candy/lollipop/chocolate bar) buttons and the
+   enchantment picker below them, echoing the grouped-sections feel of the reference mockup
+   without copying its labels/log text (that's a content decision, left for later -- see
+   genText.ts's wishingWell*Speech entries). Positioned just above where "Choose the
+   enchantment" is drawn (drawChocolateBarsStuff is called with y=14, and its "Choose the
+   enchantment" string sits a couple of rows below that once lollipops/candy have grown the
+   column -- ~18.2em matched live against the enchantment list's own top of ~20.4em). */
+body[data-place="WishingWell"] #original-game-container::after {
+    content: "";
+    position: absolute;
+    left: 0.25em;
+    top: 18.2em;
+    width: 18.5em;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(0, 229, 255, 0) 0%, rgba(0, 229, 255, 0.35) 50%, rgba(0, 229, 255, 0) 100%);
+    z-index: 0;
+    pointer-events: none;
 }
 
 /* Lighthouse and LollipopFarm both draw a lot of ascii content (Lighthouse's tall tower art
@@ -1266,3 +1332,75 @@ body[data-place="MainMap"] .quest-log-delimiter {
     color: #ffb84d;
     border-color: rgba(255, 184, 77, 0.4);
 }
+
+/* ------------------------------------------------------------
+   Painted world object: the Mill (LollipopFarm). Unlike the Wishing
+   Well (whose painted art covers that whole place), the Mill is a
+   conditional overlay on top of LollipopFarm's shared ascii
+   backdrop -- it only exists once the player has actually built it
+   (see LollipopFarm.ts's drawMillStuff/constructMill). Its ascii is
+   wrapped in .millArt spans (same drawArray spanClass trick as the
+   Well's .wishingWellArt) only while built, so gating the painted
+   version on "#original-game-container:has(.millArt)" -- rather than
+   the simpler "body[data-place=...]" the Well uses -- means it shows
+   and hides itself in step with that game-state boolean with no JS
+   of its own. LollipopFarm's #mainContent runs at 12px/1em (see the
+   font-size override above), so these ch/em values are relative to
+   that smaller grid, not the page's default 16px. Position/size
+   measured live against the mill ascii's own rendered box (x=7,y=0
+   in LollipopFarm.ts's update()).
+   ------------------------------------------------------------ */
+#original-game-container:has(.millArt) #world-object-mill {
+    display: block;
+    /* Sized/positioned from live-measured .millArt bounding box
+       (left:50 top:0 width:137 height:187 px, at the farm's 12px font-size)
+       after fixing a bug where two trailing blank ascii rows produced
+       corrupt zero-width spans (see LollipopFarm.ts's drawMillStuff comment). */
+    left: 2.5em;
+    top: -0.63em;
+    width: 11.9em;
+    height: 17.7em;
+    background-image: url('../images/places/lollipopFarm/mill.png');
+    pointer-events: auto;
+}
+
+body[data-place="LollipopFarm"] .millArt {
+    visibility: hidden;
+}
+
+#original-game-container:has(.millArt) #world-object-mill::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -2%;
+    width: 55%;
+    height: 6%;
+    transform: translateX(-50%);
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 72%);
+    filter: blur(10px);
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* Hover aura in a warm amber tone (rather than the Well's cyan) to match the mill's own lit
+   windows instead of the Well's cold cyan/purple magic -- see worldObjectAuraBreathe above,
+   reused here with a different glow color via filter's drop-shadow color. */
+@keyframes worldObjectAuraBreatheAmber {
+    0%, 100% { filter: drop-shadow(0 0 14px rgba(255, 184, 77, 0.25)); }
+    50%      { filter: drop-shadow(0 0 26px rgba(255, 184, 77, 0.5)); }
+}
+
+#original-game-container:has(.millArt) #world-object-mill:hover {
+    animation: worldObjectAuraBreatheAmber 2.4s ease-in-out infinite;
+}
+
+/* Dust/magic motes drifting up past the sails, amber-tinted to match the hover aura and the
+   lit windows (the shared worldObjectMoteRise keyframe is colorless -- it just moves/fades a
+   span -- so color comes from each mote's own background). */
+#world-object-mill .world-object-mote {
+    background: radial-gradient(circle, rgba(255, 200, 130, 0.9) 0%, rgba(255, 184, 77, 0) 70%);
+}
+
+#world-object-mill .world-object-mote:nth-child(1) { left: 30%; bottom: 55%; animation-delay: 0s;   animation-duration: 5.5s; }
+#world-object-mill .world-object-mote:nth-child(2) { left: 55%; bottom: 60%; animation-delay: 1.8s; animation-duration: 6.5s; }
+#world-object-mill .world-object-mote:nth-child(3) { left: 42%; bottom: 50%; animation-delay: 3.4s; animation-duration: 5.8s; }

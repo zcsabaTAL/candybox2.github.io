@@ -21,7 +21,8 @@ class WorldObjectLayer {
     // same idea, just scoped to this one object instead of the whole screen) to give it. 0
     // for none.
     private static OBJECTS: { id: string; motes: number }[] = [
-        { id: "world-object-wishingwell", motes: 4 }
+        { id: "world-object-wishingwell", motes: 4 },
+        { id: "world-object-mill", motes: 3 }
     ];
 
     public static init(): void {

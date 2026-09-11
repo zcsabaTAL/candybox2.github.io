@@ -225,7 +225,20 @@ class LollipopFarm extends Place{
         // If the mill is constructed
         if(Saving.loadBool("lollipopFarmMillConstructed") == true){
             // Draw the mill ascii art
-            this.renderArea.drawArray(Database.getAscii("places/lollipopFarm/mill"), x, y);
+            // spanClass wraps every row in its own <span class="millArt"> (see
+            // RenderArea.drawArray) so design.css can hide it once the painted mill
+            // world-object is showing, the same trick used for the Wishing Well's ascii
+            // (see WishingWell.ts's update()) -- robust regardless of the painted image's
+            // exact size/position.
+            // Trim trailing blank rows before wrapping in spanClass: a zero-length
+            // row produces a zero-width <span></span> (open+close tag at the same x),
+            // which corrupts the row's tag nesting and lets the millArt span swallow
+            // all subsequent farm content on the page (verified live: with the blank
+            // rows included, .millArt spans measured a bogus ~735x575 bounding box
+            // instead of the mill's real ~137x187 art).
+            var millAscii = Database.getAscii("places/lollipopFarm/mill");
+            while(millAscii.length > 0 && millAscii[millAscii.length - 1].length === 0) millAscii = millAscii.slice(0, -1);
+            this.renderArea.drawArray(millAscii, x, y, null, "millArt");
             
             // Draw the button to feed the mill
             this.renderArea.addAsciiRealButton(Database.getText("lollipopFarmFeedMill") + " (" + Algo.numberToStringButNicely(this.getNumberOfLollipopsToFeedTheMill()) + " lollipops)", x+30, y, "lollipopFarmFeedMillButton", Database.getTranslatedText("lollipopFarmFeedMill"), true, -1, null, false);
