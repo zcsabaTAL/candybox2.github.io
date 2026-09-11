@@ -8,6 +8,10 @@ class Forest extends Quest{
     // The ground y position
     private groundYPosition: number = 20;
     
+    // How many columns are visible on screen at once -- the rest of the 294-wide forest
+    // scrolls in/out as the player moves (see calcNewGlobalDrawingOffset()).
+    private viewportWidth: number = 140;
+    
     // The mosquito timer (mosquitos will come when the timer reaches 0)
     private mosquitoTimer: number = 250;
     
@@ -16,7 +20,11 @@ class Forest extends Quest{
         super(game);
         
         // Resize the quest
-        this.resizeQuest(294, this.groundYPosition + 2);
+        // The forest is 294 columns wide (see thePlayerWon()'s win-at-x>=294 check), but the
+        // *visible* window is much narrower -- forcing the real quest size wider than the
+        // drawing size (same trick TheHole uses for its vertical scroll) turns on a horizontal
+        // "camera" via globalDrawingOffset.x: see calcNewGlobalDrawingOffset() below.
+        this.resizeQuest(this.viewportWidth, this.groundYPosition + 2, new Pos(294, this.groundYPosition + 2));
         
         // Add collision boxes around
         this.addPlayerCollisionBoxes(true, false, true, true);
@@ -42,6 +50,17 @@ class Forest extends Quest{
     // Public methods
     public castPlayerTeleport(): void{
         super.castPlayerTeleport(new Pos(0, this.groundYPosition), new Pos(10, 1));
+    }
+    
+    public getGap(): number{
+        // The base Quest.getGap() shifts the *whole* rendered block sideways (via a CSS
+        // "left" the modern layout doesn't actually honor -- see design.css's #mainContent
+        // note) to keep a wide, non-scrolling quest's player roughly centered. Forest no longer
+        // needs that: calcNewGlobalDrawingOffset() already keeps the player in view by scrolling
+        // the 294-wide level *within* the render area itself, so we opt out here to avoid the
+        // two mechanisms fighting (getGap()'s formula assumes the old, unscrolled full-width
+        // render area and would badly overshoot against our narrower one).
+        return 0;
     }
     
     public configPlayerOrClone(entity: QuestEntity): void{
@@ -85,11 +104,16 @@ class Forest extends Quest{
             this.updateEntities();
         }
         
+        // Keep the camera centered (with a dead zone) on the player before drawing anything,
+        // so the background tiles and every entity -- which already read globalDrawingOffset
+        // in their own draw() -- line up for this frame.
+        this.calcNewGlobalDrawingOffset();
+        
         // Draw
         this.preDraw();
-        this.getRenderArea().drawArray(Database.getAscii("places/quests/forest/background"), this.getRealQuestPosition().x, this.getRealQuestPosition().y);
-        this.getRenderArea().drawArray(Database.getAscii("places/quests/forest/background"), this.getRealQuestPosition().x + 98, this.getRealQuestPosition().y);
-        this.getRenderArea().drawArray(Database.getAscii("places/quests/forest/background"), this.getRealQuestPosition().x + 98*2, this.getRealQuestPosition().y);
+        this.getRenderArea().drawArray(Database.getAscii("places/quests/forest/background"), this.getRealQuestPosition().x + this.getGlobalDrawingOffset().x, this.getRealQuestPosition().y);
+        this.getRenderArea().drawArray(Database.getAscii("places/quests/forest/background"), this.getRealQuestPosition().x + this.getGlobalDrawingOffset().x + 98, this.getRealQuestPosition().y);
+        this.getRenderArea().drawArray(Database.getAscii("places/quests/forest/background"), this.getRealQuestPosition().x + this.getGlobalDrawingOffset().x + 98*2, this.getRealQuestPosition().y);
         this.drawEntities();
         this.drawAroundQuest();
         if(this.getQuestEnded() == false) this.addExitQuestButton(new CallbackCollection(this.getGame().goToMainMap.bind(this.getGame())), "buttonExitQuestNoKeeping");
@@ -99,6 +123,30 @@ class Forest extends Quest{
     }
     
     // Private methods
+    private calcNewGlobalDrawingOffset(): void{
+        // Dead zone: as long as the player stays within this middle band of the viewport, the
+        // camera doesn't move at all (avoids jittery scrolling on every single step). The band
+        // is shifted slightly ahead of center so upcoming monsters (which the player mostly
+        // walks into, moving right) are visible sooner rather than appearing right at the edge.
+        var leftEdge: number = Math.floor(this.viewportWidth * 0.35);
+        var rightEdge: number = Math.floor(this.viewportWidth * 0.65);
+        var playerX: number = this.getGame().getPlayer().getGlobalPosition().x;
+        var offsetX: number = this.getGlobalDrawingOffset().x;
+        
+        if(playerX + offsetX > rightEdge)
+            offsetX = -playerX + rightEdge;
+        else if(playerX + offsetX < leftEdge)
+            offsetX = -playerX + leftEdge;
+        
+        // Never scroll past either end of the level -- the start (offset 0) or the point where
+        // the last column of the 294-wide level lines up with the right edge of the viewport.
+        var minOffsetX: number = Math.min(0, -(294 - this.viewportWidth));
+        if(offsetX > 0) offsetX = 0;
+        if(offsetX < minOffsetX) offsetX = minOffsetX;
+        
+        this.setGlobalDrawingOffset(new Pos(offsetX, 0));
+    }
+    
     private addGround(): void{
         var ground: Wall = new Wall(this, new Pos(0, 0));
         ground.addBox(new Pos(0, this.groundYPosition+1), new Pos(350, 1));
