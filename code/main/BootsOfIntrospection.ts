@@ -8,4 +8,9 @@ class BootsOfIntrospection extends EqItem{
               "eqItemBootsBootsOfIntrospectionDescription",
               "eqItems/boots/bootsOfIntrospection");
     }
+    
+    // Special ability
+    public getSpecialAbility(): string{
+        return "You do not move while touching the ground (boots of introspection).";
+    }
 }

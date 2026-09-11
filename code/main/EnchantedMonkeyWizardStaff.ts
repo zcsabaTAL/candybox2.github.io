@@ -28,6 +28,11 @@ class EnchantedMonkeyWizardStaff extends MonkeyWizardStaffMotherClass{
         return qew;
     }
     
+    // Special ability
+    public getSpecialAbility(): string{
+        return "Very frequently casts magical purple balls at enemies (monkey wizard staff (enchanted)).";
+    }
+    
     // update()
     public update(player: Player, quest: Quest): void{
         // Handle the timer
