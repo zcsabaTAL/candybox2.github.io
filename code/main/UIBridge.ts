@@ -131,6 +131,11 @@ class UIBridge {
                         title = "THE FORGE";
                         flavor = "&ldquo;The rhythmic ring of an anvil echoes off soot-stained timber.&rdquo;";
                         break;
+                    case "Dragon":
+                        subtitle = "&laquo; <span class=\"highlight\">THE CASTLE</span> &raquo;";
+                        title = "THE DRAGON'S LAIR";
+                        flavor = "&ldquo;Beneath the mountain's breath, ancient embers still glow in the dark.&rdquo;";
+                        break;
                     default:
                         // Convert CamelCase to UPPERCASE SPACE for default
                         if (currentPlaceName) {
