@@ -6,6 +6,10 @@ Working branch: `codex/cb3-phase-0`
 
 GitHub baseline revision: `43cf4fe7a10e498decceddbc0f0a6dad8421abe2`
 
+Reconciled local main-track revision: `127ee4b`
+
+Phase 0 and main-track merge revision: `f5fda48`
+
 ## Scope
 
 This phase establishes a reproducible safety baseline. It does not migrate gameplay state, change save keys, or redirect any legacy gameplay path.
@@ -55,7 +59,7 @@ The first browser automation slice uses pinned Playwright 1.63.0 and Chromium on
 npm run test:smoke
 ```
 
-The suite verifies the empty-profile start modal, legacy new-game startup, preservation of pre-existing slot storage, and development versus production visibility of the DEV MODE control.
+The suite verifies the empty-profile start modal, legacy new-game startup, preservation of pre-existing slot storage, development versus production visibility of the DEV MODE control, and a legacy slot journey through CandyBox, Village, MainMap, Forge, wooden sword purchase, explicit save, and reload.
 
 Verified on 2026-09-12:
 
@@ -63,8 +67,10 @@ Verified on 2026-09-12:
 - TypeScript 1.4.1 development build passed;
 - TypeScript 1.4.1 production build passed;
 - Playwright 1.63.0 with Chromium;
-- four development-profile smoke tests passed;
-- four production-profile smoke tests passed.
+- six development-profile smoke tests passed;
+- six production-profile smoke tests passed.
+
+Declarative legacy fixture definitions live in `tests/fixtures/legacy-save-fixtures.js`. The test helper materializes a complete slot through the legacy `LocalSaving` registry, so fixtures contain every currently registered legacy key and no CB3 payload.
 
 ## Preserved Drive changes
 
@@ -83,4 +89,4 @@ These preserved changes must not be attributed to the Phase 0 architecture work 
 
 ## Next bounded step
 
-After both builds and the manual smoke baseline pass, add a Chromium-only Playwright spike for three or four stable paths. Do not change gameplay ownership in that spike.
+Introduce the Phase 2 candy facade around the still-authoritative legacy `Candies` object. Keep all existing gameplay paths on legacy implementations until facade parity and idempotency tests pass.

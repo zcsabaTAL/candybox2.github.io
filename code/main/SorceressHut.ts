@@ -23,12 +23,6 @@ class SorceressHut extends Place{
         // Resize & update
         this.renderArea.resize(144, 48);
         this.update();
-        VoiceBridge.playSorceressEvent(this.currentSpeech);
-    }
-    
-    // willStopBeingDisplayed
-    public willStopBeingDisplayed(): void{
-        VoiceBridge.stop();
     }
     
     // willBeDisplayed
