@@ -144,6 +144,21 @@ class UIBridge {
                         title = "THE DRAGON'S LAIR";
                         flavor = "&ldquo;Beneath the mountain's breath, ancient embers still glow in the dark.&rdquo;";
                         break;
+                    case "InsideFortress":
+                        subtitle = "&laquo; <span class=\"highlight\">THE DESERT</span> &raquo;";
+                        title = "DESERT FORTRESS";
+                        flavor = "&ldquo;Twelve stone steps lead into a silence older than the sands.&rdquo;";
+                        break;
+                    case "OutsideTheHole":
+                        subtitle = "&laquo; <span class=\"highlight\">THE ABYSS</span> &raquo;";
+                        title = "A BIG HOLE";
+                        flavor = "&ldquo;A gaping dark mouth in the earth, whispering of things buried below.&rdquo;";
+                        break;
+                    case "TheHole":
+                        subtitle = "&laquo; <span class=\"highlight\">FREE FALL</span> &raquo;";
+                        title = "THE DESCENT";
+                        flavor = "&ldquo;Stone rushes past in the dark. Don't look down.&rdquo;";
+                        break;
                     default:
                         // Convert CamelCase to UPPERCASE SPACE for default
                         if (currentPlaceName) {

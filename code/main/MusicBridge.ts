@@ -48,6 +48,13 @@ class MusicBridge {
         "Dragon": "music/places/dragon.mp3",
         // The Developer quest (reached from the Dragon inside the Castle)
         "Developer": "music/places/developer.mp3",
+        // Desert Fortress and its rooms (continuous theme across the fortress and all 3 rooms)
+        "InsideFortress": "music/places/fortress.mp3",
+        "FortressRoom1": "music/places/fortress.mp3",
+        "FortressRoom2": "music/places/fortress.mp3",
+        "FortressRoom3": "music/places/fortress.mp3",
+        // The Hole quest (falling down into the subterranean abyss)
+        "TheHole": "music/places/theHole.mp3",
         // Inventory / Save / Settings (Cfg) are menu-like screens rather than "places" with their
         // own atmosphere, so they all share one calmer, out-of-the-action theme.
         "Inventory": "music/menus.mp3",
