@@ -512,8 +512,8 @@ class Quest extends Place{
         // Draw the special instruction
         this.drawSpecialInstruction();
         
-        // Draw the quest log
-        this.drawQuestLog();
+        // Draw the quest log -- disabled on the ASCII grid, rendered in DOM via UIBridge
+        // this.drawQuestLog();
     }
     
     // Always-visible corner HUD: the player's own HP, plus the HP of whichever hostile entity is

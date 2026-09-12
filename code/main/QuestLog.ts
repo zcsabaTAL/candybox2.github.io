@@ -62,6 +62,21 @@ class QuestLog{
         }
     }
     
+    public getMessageCount(): number{
+        return this.messages.length;
+    }
+    
+    public getMessageAt(index: number): QuestLogMessage{
+        if(index >= 0 && index < this.messages.length){
+            return this.messages[index];
+        }
+        return null;
+    }
+    
+    public getMessages(): QuestLogMessage[]{
+        return this.messages.slice(0);
+    }
+    
     // Private methods
     private checkLogSize(): void{
         if(this.messages.length > 10){

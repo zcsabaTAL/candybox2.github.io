@@ -43,4 +43,16 @@ class QuestLogMessage{
             if(this.bold) renderArea.addBold(pos.x + width - this.right.length, width, pos.y);
         }
     }
+    
+    public getLeft(): string{
+        return this.left;
+    }
+    
+    public getRight(): string{
+        return this.right;
+    }
+    
+    public isBold(): boolean{
+        return this.bold;
+    }
 }

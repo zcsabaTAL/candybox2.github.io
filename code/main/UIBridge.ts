@@ -30,6 +30,7 @@ class UIBridge {
     private game: Game;
     private lastPlaceName: string = "";
     private lastNavSignature: string = "";
+    private lastQuestLogSignature: string = "";
     private disposed: boolean = false;
     
     constructor(game: Game) {
@@ -44,6 +45,12 @@ class UIBridge {
     
     public dispose(): void {
         this.disposed = true;
+        var logContainer = document.getElementById("ui-quest-log");
+        if (logContainer) {
+            logContainer.style.display = "none";
+            logContainer.innerHTML = "";
+        }
+        this.lastQuestLogSignature = "";
     }
     
     private updateLoop() {
@@ -53,6 +60,7 @@ class UIBridge {
         this.updateHeaders();
         this.updateNav();
         this.updateHealthBar();
+        this.updateQuestLog();
         setTimeout(this.updateLoop.bind(this), 100);
     }
     
@@ -296,5 +304,72 @@ class UIBridge {
         var text = document.getElementById("ui-health-text");
         var textStr = hp + " / " + maxHp;
         if (text && text.textContent !== textStr) text.textContent = textStr;
+    }
+    
+    private updateQuestLog(): void {
+        var container = document.getElementById("ui-quest-log");
+        if (!container) return;
+        
+        var currentPlace: any = this.game['place'];
+        var isQuest: boolean = (typeof Quest !== "undefined" && currentPlace instanceof Quest);
+        
+        if (!isQuest) {
+            if (container.style.display !== "none") {
+                container.style.display = "none";
+                this.lastQuestLogSignature = "";
+            }
+            return;
+        }
+        
+        if (container.style.display !== "flex") {
+            container.style.display = "flex";
+        }
+        
+        var questLog: QuestLog = this.game.getQuestLog();
+        var msgCount: number = questLog.getMessageCount();
+        
+        var lastMsg: QuestLogMessage = msgCount > 0 ? questLog.getMessageAt(msgCount - 1) : null;
+        var sig: string = msgCount + "_" + (lastMsg ? (lastMsg.getLeft() + "|" + lastMsg.getRight() + "|" + (lastMsg.isBold() ? "1" : "0")) : "");
+        if (sig === this.lastQuestLogSignature) return;
+        this.lastQuestLogSignature = sig;
+        
+        container.innerHTML = "";
+        var fragment: DocumentFragment = document.createDocumentFragment();
+        for (var i = 0; i < msgCount; i++) {
+            var msg: QuestLogMessage = questLog.getMessageAt(i);
+            if (!msg) continue;
+            var left: string = msg.getLeft() || "";
+            var right: string = msg.getRight() || "";
+            
+            // If this is a delimiter row (starts with "---")
+            if (left.indexOf("---") === 0) {
+                var divider = document.createElement("div");
+                divider.className = "quest-log-divider";
+                fragment.appendChild(divider);
+                continue;
+            }
+            
+            // Skip purely empty spacer rows
+            if (left.length === 0 && right.length === 0) continue;
+            
+            var row = document.createElement("div");
+            row.className = msg.isBold() ? "quest-log-row quest-log-bold" : "quest-log-row";
+            
+            var textSpan = document.createElement("span");
+            textSpan.className = "quest-log-text";
+            textSpan.textContent = left;
+            row.appendChild(textSpan);
+            
+            if (right.length > 0) {
+                var countSpan = document.createElement("span");
+                countSpan.className = "quest-log-count";
+                countSpan.textContent = right;
+                row.appendChild(countSpan);
+            }
+            
+            fragment.appendChild(row);
+        }
+        container.appendChild(fragment);
+        container.scrollTop = container.scrollHeight;
     }
 }
