@@ -111,6 +111,10 @@ $(document).ready(function(){
     if (typeof MusicBridge !== "undefined") MusicBridge.init();
     if (typeof MusicVolumeUI !== "undefined") MusicVolumeUI.init();
 
+    // Developer controls are hidden by default in HTML. Only an explicit
+    // development build may reveal them.
+    if (typeof BuildConfig !== "undefined") BuildConfig.applyEnvironmentUi();
+
     Main.setUrlData(window.location.search);
     if (typeof StartGameModal !== "undefined") {
         StartGameModal.init();

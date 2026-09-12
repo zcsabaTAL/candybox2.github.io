@@ -1,5 +1,23 @@
 {
+  "name": "candybox2",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "generate": "node scripts/generate-content.js",
+    "build": "npm run build:dev",
+    "build:dev": "node scripts/build.js development",
+    "build:prod": "node scripts/build.js production",
+    "generate:build-config": "node scripts/generate-build-config.js development",
+    "test:smoke": "npm run test:smoke:dev && npm run test:smoke:prod",
+    "test:smoke:dev": "CB_BUILD_PROFILE=development playwright test",
+    "test:smoke:prod": "CB_BUILD_PROFILE=production playwright test"
+  },
   "dependencies": {
-    "typescript": "^1.4.1"
+    "typescript": "1.4.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0"
   }
 }

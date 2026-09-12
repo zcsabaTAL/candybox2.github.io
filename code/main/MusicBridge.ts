@@ -37,6 +37,8 @@ class MusicBridge {
         // their own theme instead of falling back to the generic fight track.
         "MonkeyWizardQuest": "music/places/monkeyWizardQuest.mp3",
         "OctopusKingQuest": "music/places/octopusKingQuest.mp3",
+        // The Dragon room inside the Castle
+        "Dragon": "music/places/dragon.mp3",
         // Inventory / Save / Settings (Cfg) are menu-like screens rather than "places" with their
         // own atmosphere, so they all share one calmer, out-of-the-action theme.
         "Inventory": "music/menus.mp3",
@@ -336,3 +338,4 @@ class MusicVolumeUI {
         if (slider) slider.value = MusicBridge.getVolume().toString();
     }
 }
+

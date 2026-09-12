@@ -30,6 +30,16 @@ class VoiceBridge {
         VoiceBridge.playSingle(blacksmithFile);
     }
 
+    public static playOvenEvent(speechId: string): void {
+        var ovenFile: string = "audio/voice/oven/" + speechId + ".wav";
+        VoiceBridge.playSingle(ovenFile);
+    }
+
+    public static playSorceressEvent(speechId: string): void {
+        var sorceressFile: string = "audio/voice/sorceress/" + speechId + ".wav";
+        VoiceBridge.playSingle(sorceressFile);
+    }
+
     public static playDialogue(playerTrack: string, responderTrack: string): void {
         VoiceBridge.stop();
 
@@ -160,3 +170,4 @@ class VoiceBridge {
         VoiceBridge.currentPlace = placeName;
     }
 }
+
