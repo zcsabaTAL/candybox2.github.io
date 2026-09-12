@@ -124,6 +124,8 @@ $(document).ready(function(){
     // development build may reveal them.
     if (typeof BuildConfig !== "undefined") BuildConfig.applyEnvironmentUi();
 
+    if (typeof FeatureFlags !== "undefined") FeatureFlags.initialize(window.location.search);
+
     Main.setUrlData(window.location.search);
     if (typeof StartGameModal !== "undefined") {
         StartGameModal.init();
