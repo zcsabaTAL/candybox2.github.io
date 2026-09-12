@@ -21,10 +21,10 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -43,31 +43,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      - name: Generate TypeScript sources from ascii art and translations
-        working-directory: pythonScripts
-        env:
-          PYTHONUTF8: "1"
-        run: |
-          mkdir -p ../code/gen
-          python3 genAscii.py
-          python3 genText.py
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
 
-      - name: Compile TypeScript
-        run: |
-          npx --yes --package typescript@1.7.5 -- tsc ./libs/*.ts ./code/main/*.ts ./code/gen/*.ts ./code/arena/*/*.ts --out ./candybox2_compiled.js --target ES5
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build production bundle
+        run: npm run build:prod
 
       - name: Minify
         run: |
-          npx --yes terser ./candybox2_compiled.js -o ./candybox2_minified.js --compress --mangle
+          npx --yes terser ./candybox2.js -o ./candybox2_minified.js --compress --mangle
 
       - name: Assemble site
         run: |
           mkdir _site
-          rsync -a --exclude '.git' --exclude '.github' --exclude '_site' --exclude 'candybox2_compiled.js' --exclude 'candybox2_minified.js' ./ _site/
+          rsync -a --exclude '.git' --exclude '.github' --exclude '_site' --exclude 'candybox2_minified.js' ./ _site/
           cat candybox2_sourceCodeLicense.txt candybox2_minified.js > _site/candybox2.js
-          cat candybox2_sourceCodeLicense.txt candybox2_compiled.js > _site/candybox2_uncompressed.js
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
