@@ -8,7 +8,7 @@ This document records the current authoritative owner of durable gameplay state 
 
 | Domain | Current authoritative owner | Persistence shape | New architecture status | Migration complexity |
 | --- | --- | --- | --- | --- |
-| Candies and other resources | The `Game` resource objects, especially `Candies`, backed by registered `Saving` numbers | Coherent objects with `Current`, `Max`, and `Accumulated` numeric keys | Legacy-only | Low for a facade, medium for complete writer routing |
+| Candies and other resources | The `Game` resource objects, especially `Candies`, backed by registered `Saving` numbers | Coherent objects with `Current`, `Max`, and `Accumulated` numeric keys | Legacy-authoritative facade. One flagged `eatAll` writer is routed through `CandySystem` | Medium for complete writer routing |
 | Inventory ownership | `Game.gridItems` and item instances, backed by one bool per item | Flat keys such as `gridItemPossessed*` and `eqItem*` | Legacy-only | Medium to high |
 | Equipped items | `Game.selectedEqItems`, reconstructed from `Saving` strings | Separate strings such as `gameWeaponSelected` | Legacy-only | Medium |
 | Navigation and visible place | The current `Game.place` plus the transient `Game.savedPlace` return target | Mostly runtime object state, with unlock facts in flat `Saving` keys | Legacy-only | Medium |
@@ -42,7 +42,7 @@ This document records the current authoritative owner of durable gameplay state 
 | Direct `Saving.save*` calls | 248 | Flat-state writes, including internal save implementation |
 | Direct `Saving.register*` calls | 163 | Explicit registrations. Item constructors also register dynamic item keys |
 | Direct `getCandies().add(...)` calls | 20 | Candy mutation sites outside the resource implementation |
-| Direct `getCandies().transferTo(...)` calls | 7 | Multi-resource candy transfers |
+| Direct `getCandies().transferTo(...)` calls | 7 | Six always-legacy transfers plus the retained rollback branch for the flagged Candy Box `eatAll` pilot |
 | Files containing either direct candy mutation form | 12 | Minimum candy writer migration surface |
 | Files containing navigation construction or `goTo*` calls | 41 | Navigation coupling surface |
 | Quest and encounter files directly using `Saving` | 14 | Minimum reverse-engineering surface for quest progress |
