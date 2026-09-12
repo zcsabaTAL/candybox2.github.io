@@ -1,8 +1,11 @@
 ///<reference path="Place.ts"/>
+///<reference path="CommandResult.ts"/>
+///<reference path="FeatureFlags.ts"/>
 
 Saving.registerBool("candyBoxBoxOpened", false);
 
 class CandyBox extends Place{
+    private static eatAllTransactionCounter: number = 0;
     private renderArea: RenderArea = new RenderArea();
     
     private eatButtonShown: boolean = false;
@@ -166,9 +169,19 @@ class CandyBox extends Place{
     
     private clickedEatCandiesButton(): void{
         if(this.getGame().getCandies().getCurrent() >= 1){
-            this.getGame().getCandies().transferTo(this.getGame().getCandiesEaten());
-            this.update();
-            this.getGame().updatePlace();
+            var succeeded: boolean;
+            if(typeof FeatureFlags !== "undefined" && FeatureFlags.isCandyFacadeEnabled()){
+                CandyBox.eatAllTransactionCounter++;
+                var result: CommandResult = Main.getServices().candies.eatAll("candy-box:eat-all:" + CandyBox.eatAllTransactionCounter);
+                succeeded = result.ok;
+            }else{
+                succeeded = this.getGame().getCandies().transferTo(this.getGame().getCandiesEaten());
+            }
+
+            if(succeeded){
+                this.update();
+                this.getGame().updatePlace();
+            }
         }
     }
     
