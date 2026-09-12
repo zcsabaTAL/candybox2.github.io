@@ -1173,34 +1173,83 @@ body[data-place="LollipopFarm"] #mainContent {
    letter-spacing, a dimmer body tone with the trailing "(found so
    far)" counts picked out in a warmer accent, and the two delimiter
    rows turned from literal dashes into a soft gradient hairline.
+/* ------------------------------------------------------------
+   Quest battle log (#ui-quest-log / .quest-log-panel)
+   Decoupled from ASCII character grid and rendered cleanly into
+   the DOM via UIBridge.
+   Positioned relative to #original-game-container in the top-right
+   info zone, leaving the bottom playfield entirely unobstructed.
    ------------------------------------------------------------ */
-/* Pins the *entire* battle log (both delimiter rows and every message row -- see
-   QuestLog.ts's single wrapping span) to a small, unobtrusive scrollable box instead of it
-   sitting inline as up to 12 full-width rows. It used to just dominate the screen -- worst on
-   the Forest quest once its viewport got narrower (see Forest.ts's camera), but really on every
-   quest -- pushing the actually important stuff (health, entities) further down the page than
-   necessary. Same corner-pill visual language as .quest-combat-hud-*, mirrored to the opposite
-   (bottom-right) corner so the two don't compete for the same space.
-   NOTE: content stays unwrapped (white-space: pre, inherited from #mainContent) because each
-   line's trailing "(NNN found so far)" is right-aligned using literal padding spaces baked into
-   the ascii grid -- wrapping would break that alignment. overflow-x covers the rare line that's
-   wider than the panel; overflow-y plus the capped height is what actually keeps it small,
-   scrolling to reveal older entries instead of pushing the page taller. */
 .quest-log-panel {
-    position: fixed !important;
-    z-index: 60;
-    right: calc(max(0px, (100vw - 1400px)/2) + 40px);
-    bottom: 20px;
-    max-width: min(420px, calc(100vw - 80px));
-    max-height: 130px;
+    position: absolute;
+    top: 48px;
+    right: 10px;
+    z-index: 50;
+    width: 320px;
+    max-width: 35%;
+    max-height: 160px;
     overflow-y: auto;
-    overflow-x: auto;
-    padding: 8px 12px;
-    border-radius: 4px;
-    background: rgba(20, 20, 25, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    overflow-x: hidden;
+    padding: 10px 14px;
+    border-radius: 6px;
+    background: rgba(16, 17, 22, 0.88);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    box-sizing: border-box;
 }
 
+@media (max-width: 800px) {
+    .quest-log-panel {
+        position: relative;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: auto;
+        max-width: 100%;
+        margin-bottom: 15px;
+    }
+}
+
+.quest-log-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    line-height: 1.45;
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 11px;
+    color: rgba(215, 215, 220, 0.88);
+}
+
+.quest-log-row.quest-log-bold {
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.quest-log-text {
+    flex: 1;
+    word-break: break-word;
+}
+
+.quest-log-count {
+    color: rgba(230, 195, 135, 0.95);
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.quest-log-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.08);
+    margin: 3px 0;
+}
+
+/* Legacy fallback styles for the ASCII grid renderer if ever re-enabled */
 .quest-log-line {
     font-family: 'JetBrains Mono', 'Courier New', Courier, monospace;
     font-size: 11px;

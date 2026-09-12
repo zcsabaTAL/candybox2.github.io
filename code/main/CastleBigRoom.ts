@@ -33,6 +33,16 @@ class CastleBigRoom extends CastleRoom{
         this.update();
     }
     
+    // willBeDisplayed
+    public willBeDisplayed(): void{
+        VoiceBridge.playOvenEvent(this.currentSpeech);
+    }
+    
+    // willStopBeingDisplayed
+    public willStopBeingDisplayed(): void{
+        VoiceBridge.stop();
+    }
+    
     // getRenderArea()
     public getRenderArea(): RenderArea{
         return this.renderArea;
@@ -111,6 +121,7 @@ class CastleBigRoom extends CastleRoom{
         // We update
         this.update();
         this.getGame().updatePlace();
+        VoiceBridge.playOvenEvent(this.currentSpeech);
     }
     
     private thanksHoven(): void{
@@ -123,5 +134,6 @@ class CastleBigRoom extends CastleRoom{
         // Update
         this.update();
         this.getGame().updatePlace();
+        VoiceBridge.playOvenEvent(this.currentSpeech);
     }
 }

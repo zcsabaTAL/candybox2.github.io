@@ -6,6 +6,8 @@
 /candybox2_uncompressed.js
 /code/gen/
 node_modules/
+test-results/
+playwright-report/
 _to_delete/
 audio/test/
 ux_redesign_assets/

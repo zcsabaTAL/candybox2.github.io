@@ -58,7 +58,19 @@ class SecondHouse extends House{
     // Public methods
     public willBeDisplayed(): void{
         // We need to update each time we're going to be displayed in case some item should not be sold anymore because of some stuff we were doing while this place wasn't displayed
+        this.shouldDrawIntroSpeech = true;
+        this.selectedItemIndex = null;
         this.update();
+        if (typeof VoiceBridge !== "undefined") {
+            VoiceBridge.playMerchantEvent("secondHouseIntroSpeech");
+        }
+    }
+    
+    // willStopBeingDisplayed
+    public willStopBeingDisplayed(): void{
+        if (typeof VoiceBridge !== "undefined") {
+            VoiceBridge.stop();
+        }
     }
     
     // getRenderArea()
@@ -92,6 +104,11 @@ class SecondHouse extends House{
         
         // We shouldn't draw the intro speech anymore
         this.shouldDrawIntroSpeech = false;
+        
+        // Play merchant voice for the selected item
+        if (typeof VoiceBridge !== "undefined") {
+            VoiceBridge.playMerchantEvent(this.items[this.selectedItemIndex].getMerchantSpeech());
+        }
         
         // Update
         this.update();

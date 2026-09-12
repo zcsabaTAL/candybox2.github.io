@@ -4,6 +4,7 @@
 module Main{
     // The game
     var game: Game = null;
+    var services: GameServices = null;
     
     // Information about loading
     var loadingType: MainLoadingType = MainLoadingType.NONE;
@@ -86,11 +87,19 @@ module Main{
         documentIsReady();
     }
 
+    export function getServices(): GameServices{
+        return services;
+    }
+
     function start(): void{
+        if(services != null) services.dispose();
+        if(game != null) game.clearAllIntervals();
+
         game = new Game(gameMode);
         Keyboard.setGame(game);
         Saving.load(game, loadingType, loadingString);
         game.postLoad();
+        services = new GameServices(game);
         
         // Initialize the custom UI Bridge only now, once the save data (if any) has actually been
         // loaded into the game's resources. Doing this earlier (e.g. inside the Game constructor)
@@ -110,6 +119,10 @@ $(document).ready(function(){
     if (typeof WorldObjectLayer !== "undefined") WorldObjectLayer.init();
     if (typeof MusicBridge !== "undefined") MusicBridge.init();
     if (typeof MusicVolumeUI !== "undefined") MusicVolumeUI.init();
+
+    // Developer controls are hidden by default in HTML. Only an explicit
+    // development build may reveal them.
+    if (typeof BuildConfig !== "undefined") BuildConfig.applyEnvironmentUi();
 
     Main.setUrlData(window.location.search);
     if (typeof StartGameModal !== "undefined") {

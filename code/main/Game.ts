@@ -131,6 +131,7 @@ class Game{
     
     // Store the one second interval id (to clear it when we'll load our save from a file)
     private oneSecondIntervalId: number;
+    private questTimeoutId: number;
     
     // Is the status bar allowed to use the n key to go to the next tab? (this is set to false when using the computer...)
     private isStatusBarAllowedToUseTheNKey: boolean = true;
@@ -165,7 +166,7 @@ class Game{
         
         // We launch timeouts & intervals methods
         this.oneSecondIntervalId = window.setInterval(this.oneSecondMethod.bind(this), 1000);
-        window.setTimeout(this.questMethod.bind(this), 100);
+        this.questTimeoutId = window.setTimeout(this.questMethod.bind(this), 100);
         
     }
     
@@ -232,6 +233,7 @@ class Game{
     
     public clearAllIntervals(): void{
         clearInterval(this.oneSecondIntervalId);
+        clearTimeout(this.questTimeoutId);
     }
     
     public disableLocalAutosave(): void{
@@ -811,7 +813,7 @@ class Game{
     
     private questMethod(): void{
         // Re set the timeout, depending on if the time is slowed down or not
-        window.setTimeout(this.questMethod.bind(this), ((this.questSlowedDown && this.weAreQuesting)? 200:100 + this.getQuestSpeedUp()));
+        this.questTimeoutId = window.setTimeout(this.questMethod.bind(this), ((this.questSlowedDown && this.weAreQuesting)? 200:100 + this.getQuestSpeedUp()));
         
         // Special place callbacks
         this.questCallbackCollection.fire();
