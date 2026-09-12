@@ -31,6 +31,16 @@ class SorceressHut extends Place{
         VoiceBridge.stop();
     }
     
+    // willBeDisplayed
+    public willBeDisplayed(): void{
+        VoiceBridge.playSorceressEvent(this.currentSpeech);
+    }
+    
+    // willStopBeingDisplayed
+    public willStopBeingDisplayed(): void{
+        VoiceBridge.stop();
+    }
+    
     // getRenderArea()
     public getRenderArea(): RenderArea{
         return this.renderArea;

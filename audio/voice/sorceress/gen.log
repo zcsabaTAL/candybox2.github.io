@@ -1,0 +1,37 @@
+[15:16:37] Starting Sorceress (Galadriel Kore) dialogue generation (9 lines)...
+[15:16:37] 
+--- [1/9] sorceressHutHello.wav ---
+[15:16:37] [COPIED] sorceressHutHello.wav copied from candidate 3 (1048890 bytes)
+[15:16:37] 
+--- [2/9] sorceressHutClickedGrimoire.wav ---
+[15:16:47] [OK] Generated: sorceressHutClickedGrimoire.wav (747406 bytes)
+[15:16:47] [SLEEP] Sleeping 15s to respect RPM limit...
+[15:17:02] 
+--- [3/9] sorceressHutBuyGrimoireSpeech.wav ---
+[15:17:10] [OK] Generated: sorceressHutBuyGrimoireSpeech.wav (411406 bytes)
+[15:17:10] [SLEEP] Sleeping 15s to respect RPM limit...
+[15:17:25] 
+--- [4/9] sorceressHutClickedGrimoire2.wav ---
+[15:17:38] [OK] Generated: sorceressHutClickedGrimoire2.wav (941326 bytes)
+[15:17:38] [SLEEP] Sleeping 15s to respect RPM limit...
+[15:17:53] 
+--- [5/9] sorceressHutBuyGrimoire2Speech.wav ---
+[15:18:00] [OK] Generated: sorceressHutBuyGrimoire2Speech.wav (457486 bytes)
+[15:18:00] [SLEEP] Sleeping 15s to respect RPM limit...
+[15:18:15] 
+--- [6/9] sorceressHutClickedCauldron.wav ---
+[15:18:28] [OK] Generated: sorceressHutClickedCauldron.wav (912526 bytes)
+[15:18:28] [SLEEP] Sleeping 15s to respect RPM limit...
+[15:18:43] 
+--- [7/9] sorceressHutBuyCauldronSpeech.wav ---
+[15:18:58] [OK] Generated: sorceressHutBuyCauldronSpeech.wav (724366 bytes)
+[15:18:58] [SLEEP] Sleeping 15s to respect RPM limit...
+[15:19:13] 
+--- [8/9] sorceressHutClickedHat.wav ---
+[15:19:30] [OK] Generated: sorceressHutClickedHat.wav (1302286 bytes)
+[15:19:30] [SLEEP] Sleeping 15s to respect RPM limit...
+[15:19:45] 
+--- [9/9] sorceressHutBuyHatSpeech.wav ---
+[15:19:52] [OK] Generated: sorceressHutBuyHatSpeech.wav (622606 bytes)
+[15:19:52] 
+All Sorceress lines processing complete!

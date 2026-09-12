@@ -1,5 +1,6 @@
 class VoiceBridge {
     private static currentAudio: HTMLAudioElement = null;
+    private static currentAudioPlace: string = null;
     private static dialogueTimer: number = null;
     private static currentPlace: string = null;
     private static volume: number = 0.95;
@@ -7,41 +8,47 @@ class VoiceBridge {
     public static playLighthouseQuestion(questionId: string): void {
         var playerFile: string = "audio/voice/player/" + questionId + ".mp3";
         var cyclopsFile: string = "audio/voice/cyclops/" + questionId + "Speech.mp3";
-        VoiceBridge.playDialogue(playerFile, cyclopsFile);
+        VoiceBridge.playDialogue(playerFile, cyclopsFile, "Lighthouse");
     }
 
     public static playLighthouseEvent(eventId: string): void {
         var cyclopsFile: string = "audio/voice/cyclops/" + eventId + ".mp3";
-        VoiceBridge.playSingle(cyclopsFile);
+        VoiceBridge.playSingle(cyclopsFile, "Lighthouse");
     }
 
     public static playDragonEvent(eventId: string): void {
         var dragonFile: string = "audio/voice/dragon/" + eventId + ".wav";
-        VoiceBridge.playSingle(dragonFile);
+        VoiceBridge.playSingle(dragonFile, "Dragon");
     }
 
     public static playWishingWellEvent(speechId: string): void {
         var wellFile: string = "audio/voice/wishing_well/" + speechId + ".mp3";
-        VoiceBridge.playSingle(wellFile);
+        VoiceBridge.playSingle(wellFile, "WishingWell");
     }
 
     public static playBlacksmithEvent(speechId: string): void {
         var blacksmithFile: string = "audio/voice/blacksmith/" + speechId + ".wav";
-        VoiceBridge.playSingle(blacksmithFile);
+        VoiceBridge.playSingle(blacksmithFile, "Forge");
     }
 
     public static playOvenEvent(speechId: string): void {
         var ovenFile: string = "audio/voice/oven/" + speechId + ".wav";
-        VoiceBridge.playSingle(ovenFile);
+        VoiceBridge.playSingle(ovenFile, "CastleBigRoom");
     }
 
     public static playSorceressEvent(speechId: string): void {
         var sorceressFile: string = "audio/voice/sorceress/" + speechId + ".wav";
-        VoiceBridge.playSingle(sorceressFile);
+        VoiceBridge.playSingle(sorceressFile, "SorceressHut");
     }
 
-    public static playDialogue(playerTrack: string, responderTrack: string): void {
+    public static playMerchantEvent(speechId: string): void {
+        var merchantFile: string = "audio/voice/merchant/" + speechId + ".wav";
+        VoiceBridge.playSingle(merchantFile, "SecondHouse");
+    }
+
+    public static playDialogue(playerTrack: string, responderTrack: string, placeName: string = null): void {
         VoiceBridge.stop();
+        VoiceBridge.currentAudioPlace = placeName;
 
         if (typeof MusicBridge !== "undefined") {
             MusicBridge.setDucked(true);
@@ -86,6 +93,7 @@ class VoiceBridge {
 
             audio.addEventListener("ended", function (): void {
                 VoiceBridge.currentAudio = null;
+                VoiceBridge.currentAudioPlace = null;
                 if (typeof MusicBridge !== "undefined") {
                     MusicBridge.setDucked(false);
                 }
@@ -108,8 +116,9 @@ class VoiceBridge {
         }
     }
 
-    public static playSingle(trackPath: string): void {
+    public static playSingle(trackPath: string, placeName: string = null): void {
         VoiceBridge.stop();
+        VoiceBridge.currentAudioPlace = placeName;
 
         if (typeof MusicBridge !== "undefined") {
             MusicBridge.setDucked(true);
@@ -122,6 +131,7 @@ class VoiceBridge {
 
             audio.addEventListener("ended", function (): void {
                 VoiceBridge.currentAudio = null;
+                VoiceBridge.currentAudioPlace = null;
                 if (typeof MusicBridge !== "undefined") {
                     MusicBridge.setDucked(false);
                 }
@@ -158,16 +168,17 @@ class VoiceBridge {
             VoiceBridge.currentAudio = null;
         }
 
+        VoiceBridge.currentAudioPlace = null;
+
         if (typeof MusicBridge !== "undefined") {
             MusicBridge.setDucked(false);
         }
     }
 
     public static setPlace(placeName: string): void {
-        if (VoiceBridge.currentPlace !== null && VoiceBridge.currentPlace !== placeName) {
+        if (VoiceBridge.currentAudioPlace !== null && VoiceBridge.currentAudioPlace !== placeName) {
             VoiceBridge.stop();
         }
         VoiceBridge.currentPlace = placeName;
     }
 }
-

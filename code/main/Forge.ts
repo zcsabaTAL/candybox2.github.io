@@ -42,6 +42,10 @@ class Forge extends House{
         
         this.renderArea.resizeFromArray(Database.getAscii("places/village/forge"), 0, 3);
         this.update();
+    }
+    
+    // willBeDisplayed
+    public willBeDisplayed(): void{
         VoiceBridge.playBlacksmithEvent(this.currentSpeech);
     }
     
