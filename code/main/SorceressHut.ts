@@ -25,6 +25,16 @@ class SorceressHut extends Place{
         this.update();
     }
     
+    // willBeDisplayed
+    public willBeDisplayed(): void{
+        VoiceBridge.playSorceressEvent(this.currentSpeech);
+    }
+    
+    // willStopBeingDisplayed
+    public willStopBeingDisplayed(): void{
+        VoiceBridge.stop();
+    }
+    
     // getRenderArea()
     public getRenderArea(): RenderArea{
         return this.renderArea;
@@ -42,6 +52,7 @@ class SorceressHut extends Place{
             // We update
             this.update();
             this.getGame().updatePlace();
+            VoiceBridge.playSorceressEvent(this.currentSpeech);
         }
     }
     
@@ -55,6 +66,7 @@ class SorceressHut extends Place{
             // We update
             this.update();
             this.getGame().updatePlace();
+            VoiceBridge.playSorceressEvent(this.currentSpeech);
         }
     }
     
@@ -68,6 +80,7 @@ class SorceressHut extends Place{
             // We update
             this.update();
             this.getGame().updatePlace();
+            VoiceBridge.playSorceressEvent(this.currentSpeech);
         }
     }
     
@@ -81,6 +94,7 @@ class SorceressHut extends Place{
             // We update
             this.update();
             this.getGame().updatePlace();
+            VoiceBridge.playSorceressEvent(this.currentSpeech);
         }
     }
     
@@ -92,6 +106,7 @@ class SorceressHut extends Place{
         this.update();
         this.drawBuyingButton("sorceressHutBuyCauldronButton", new CallbackCollection(this.buyCauldron.bind(this)));
         this.getGame().updatePlace();
+        VoiceBridge.playSorceressEvent(this.currentSpeech);
     }
     
     private clickedGrimoire(): void{
@@ -102,6 +117,7 @@ class SorceressHut extends Place{
         this.update();
         this.drawBuyingButton("sorceressHutBuyGrimoireButton", new CallbackCollection(this.buyGrimoire.bind(this)));
         this.getGame().updatePlace();
+        VoiceBridge.playSorceressEvent(this.currentSpeech);
     }
     
     private clickedGrimoire2(): void{
@@ -112,6 +128,7 @@ class SorceressHut extends Place{
         this.update();
         this.drawBuyingButton("sorceressHutBuyGrimoire2Button", new CallbackCollection(this.buyGrimoire2.bind(this)));
         this.getGame().updatePlace();
+        VoiceBridge.playSorceressEvent(this.currentSpeech);
     }
     
     private clickedHat(): void{
@@ -122,6 +139,7 @@ class SorceressHut extends Place{
         this.update();
         this.drawBuyingButton("sorceressHutBuyHatButton", new CallbackCollection(this.buyHat.bind(this)));
         this.getGame().updatePlace();
+        VoiceBridge.playSorceressEvent(this.currentSpeech);
     }
     
     private drawBackground(x: number, y: number): void{

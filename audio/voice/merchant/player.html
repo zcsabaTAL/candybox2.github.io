@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="utf-8">
+    <title>Candy Box 2 – Boltos (Candy Merchant) Dialógusok</title>
+    <style>
+        body {
+            background: #0d1117;
+            color: #c9d1d9;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            max-width: 860px;
+            margin: 40px auto;
+            padding: 0 20px 40px 20px;
+        }
+        h1 {
+            color: #f59e0b;
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #8b949e;
+            margin-bottom: 24px;
+            font-size: 15px;
+        }
+        .controls-bar {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+            gap: 12px;
+        }
+        .btn-play-all {
+            background: #f59e0b;
+            color: #0d1117;
+            border: none;
+            padding: 10px 20px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-play-all:hover {
+            background: #d97706;
+        }
+        .card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: border-color 0.2s;
+        }
+        .card.active {
+            border-color: #f59e0b;
+            background: #1c1917;
+        }
+        .card h2 {
+            margin-top: 0;
+            color: #f0f6fc;
+            font-size: 18px;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .card .badge {
+            font-size: 12px;
+            background: #21262d;
+            color: #f59e0b;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: normal;
+        }
+        .card .speech-en {
+            color: #e6edf3;
+            font-size: 15px;
+            line-height: 1.5;
+            margin-bottom: 8px;
+            font-style: italic;
+        }
+        .card .speech-hu {
+            color: #8b949e;
+            font-size: 13px;
+            margin-bottom: 14px;
+        }
+        audio {
+            width: 100%;
+            height: 44px;
+            margin-bottom: 8px;
+            outline: none;
+        }
+        .meta {
+            font-size: 12px;
+            color: #6e7681;
+            display: flex;
+            justify-content: space-between;
+        }
+        .meta a {
+            color: #58a6ff;
+            text-decoration: none;
+        }
+        .meta a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>Candy Merchant (Édességárus Puck) – Hangok</h1>
+    <div class="subtitle">Candy Box 2 • Gemini 3.1 Flash TTS (Puck hangszín, 24kHz mono PCM WAV)</div>
+
+    <div class="controls-bar">
+        <button class="btn-play-all" onclick="playAll()">&#9654; Összes lejátszása sorban</button>
+    </div>
+
+    <!-- 1. Intro -->
+    <div class="card" id="card-0">
+        <h2>1. Boltba belépés (Intro) <span class="badge">~6.4 mp</span></h2>
+        <div class="speech-en">&bdquo;Hello, and welcome to my shop! If you have enough candies, you can buy some very interesting things here. Take a look at that table, see if there's anything you'd like!&rdquo;</div>
+        <div class="speech-hu">Üdvözlés, amikor a játékos belép a faluból az édességboltba.</div>
+        <audio id="audio-0" controls preload="auto" src="secondHouseIntroSpeech.wav"></audio>
+        <div class="meta">
+            <span>Fájl: <code>secondHouseIntroSpeech.wav</code></span>
+            <a href="secondHouseIntroSpeech.wav" target="_blank">Közvetlen WAV megnyitása</a>
+        </div>
+    </div>
+
+    <!-- 2. Lemon Lollipop -->
+    <div class="card" id="card-1">
+        <h2>2. Citromos nyalóka <span class="badge">~8.5 mp • 60 cukor</span></h2>
+        <div class="speech-en">&bdquo;Ah, a lemon lollipop! Sweet, sour, absolutely delicious! Only sixty candies!&rdquo;</div>
+        <div class="speech-hu">Rákattintáskor az árus a citromos nyalókát ajánlja.</div>
+        <audio id="audio-1" controls preload="auto" src="secondHouseLollipop1Speech.wav"></audio>
+        <div class="meta">
+            <span>Fájl: <code>secondHouseLollipop1Speech.wav</code></span>
+            <a href="secondHouseLollipop1Speech.wav" target="_blank">Közvetlen WAV megnyitása</a>
+        </div>
+    </div>
+
+    <!-- 3. Strawberry Lollipop -->
+    <div class="card" id="card-2">
+        <h2>3. Epres nyalóka <span class="badge">~9.2 mp • 60 cukor</span></h2>
+        <div class="speech-en">&bdquo;Strawberry flavor! Bursting with red fruit delight! Just sixty candies!&rdquo;</div>
+        <div class="speech-hu">Rákattintáskor az epres nyalókát dicséri.</div>
+        <audio id="audio-2" controls preload="auto" src="secondHouseLollipop2Speech.wav"></audio>
+        <div class="meta">
+            <span>Fájl: <code>secondHouseLollipop2Speech.wav</code></span>
+            <a href="secondHouseLollipop2Speech.wav" target="_blank">Közvetlen WAV megnyitása</a>
+        </div>
+    </div>
+
+    <!-- 4. Pumpkin Lollipop -->
+    <div class="card" id="card-3">
+        <h2>4. Tök ízű nyalóka <span class="badge">~6.4 mp • 60 cukor</span></h2>
+        <div class="speech-en">&bdquo;Pumpkin spiced! Mysterious and autumnal! Sixty candies and it is yours!&rdquo;</div>
+        <div class="speech-hu">Rákattintáskor a tökös őszi nyalókát ajánlja.</div>
+        <audio id="audio-3" controls preload="auto" src="secondHouseLollipop3Speech.wav"></audio>
+        <div class="meta">
+            <span>Fájl: <code>secondHouseLollipop3Speech.wav</code></span>
+            <a href="secondHouseLollipop3Speech.wav" target="_blank">Közvetlen WAV megnyitása</a>
+        </div>
+    </div>
+
+    <!-- 5. Leather Boots -->
+    <div class="card" id="card-4">
+        <h2>5. Tevebőr csizma <span class="badge">~6.7 mp • 300 cukor</span></h2>
+        <div class="speech-en">&bdquo;Camel leather boots! Durable and comfortable for any traveler! Three hundred candies!&rdquo;</div>
+        <div class="speech-hu">Rákattintáskor a strapabíró tevebőr csizmát ajánlja az utazónak.</div>
+        <audio id="audio-4" controls preload="auto" src="secondHouseLeatherBootsSpeech.wav"></audio>
+        <div class="meta">
+            <span>Fájl: <code>secondHouseLeatherBootsSpeech.wav</code></span>
+            <a href="secondHouseLeatherBootsSpeech.wav" target="_blank">Közvetlen WAV megnyitása</a>
+        </div>
+    </div>
+
+    <!-- 6. Leather Gloves -->
+    <div class="card" id="card-5">
+        <h2>6. Tevebőr kesztyű <span class="badge">~10.6 mp • 300 cukor</span></h2>
+        <div class="speech-en">&bdquo;Camel leather gloves! Handcrafted perfection! Keep your fingers nimble! Three hundred candies!&rdquo;</div>
+        <div class="speech-hu">Rákattintáskor a kézműves tevebőr kesztyűt ajánlja a fürge ujjakért.</div>
+        <audio id="audio-5" controls preload="auto" src="secondHouseLeatherGlovesSpeech.wav"></audio>
+        <div class="meta">
+            <span>Fájl: <code>secondHouseLeatherGlovesSpeech.wav</code></span>
+            <a href="secondHouseLeatherGlovesSpeech.wav" target="_blank">Közvetlen WAV megnyitása</a>
+        </div>
+    </div>
+
+    <!-- 7. Chocolate Bar -->
+    <div class="card" id="card-6">
+        <h2>7. Csokoládé tábla <span class="badge">~11.6 mp • 800 cukor</span></h2>
+        <div class="speech-en">&bdquo;A real chocolate bar! Rich, rare, decadently dark! Eight hundred candies!&rdquo;</div>
+        <div class="speech-hu">Rákattintáskor a ritka étcsokit ajánlja elragadtatva.</div>
+        <audio id="audio-6" controls preload="auto" src="secondHouseChocolateBarSpeech.wav"></audio>
+        <div class="meta">
+            <span>Fájl: <code>secondHouseChocolateBarSpeech.wav</code></span>
+            <a href="secondHouseChocolateBarSpeech.wav" target="_blank">Közvetlen WAV megnyitása</a>
+        </div>
+    </div>
+
+    <!-- 8. Time Ring -->
+    <div class="card" id="card-7">
+        <h2>8. Időgyűrű (Time Ring) <span class="badge">~8.7 mp • 500 cukor</span></h2>
+        <div class="speech-en">&bdquo;A mystical time ring! Bends the temporal flow itself! Five hundred candies!&rdquo;</div>
+        <div class="speech-hu">Rákattintáskor az idő folyamát meghajlító misztikus gyűrűt kínálja.</div>
+        <audio id="audio-7" controls preload="auto" src="secondHouseTimeRingSpeech.wav"></audio>
+        <div class="meta">
+            <span>Fájl: <code>secondHouseTimeRingSpeech.wav</code></span>
+            <a href="secondHouseTimeRingSpeech.wav" target="_blank">Közvetlen WAV megnyitása</a>
+        </div>
+    </div>
+
+    <!-- 9. Merchant Hat -->
+    <div class="card" id="card-8">
+        <h2>9. Kereskedő kalapja (Merchant Hat) <span class="badge">~14.0 mp • 1 000 000 cukor</span></h2>
+        <div class="speech-en">&bdquo;My prized merchant hat! Extravagant, stylish, one of a kind! A whole million candies!&rdquo;</div>
+        <div class="speech-hu">Rákattintáskor a legféltettebb, extravagáns kalapját kínálja 1 millió cukorért.</div>
+        <audio id="audio-8" controls preload="auto" src="secondHouseMerchantHatSpeech.wav"></audio>
+        <div class="meta">
+            <span>Fájl: <code>secondHouseMerchantHatSpeech.wav</code></span>
+            <a href="secondHouseMerchantHatSpeech.wav" target="_blank">Közvetlen WAV megnyitása</a>
+        </div>
+    </div>
+
+    <script>
+        const total = 9;
+        function playAll() {
+            let current = 0;
+            function playNext() {
+                if (current >= total) {
+                    document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+                    return;
+                }
+                document.querySelectorAll('.card').forEach((c, idx) => {
+                    c.classList.toggle('active', idx === current);
+                });
+                const aud = document.getElementById('audio-' + current);
+                aud.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                aud.currentTime = 0;
+                aud.play();
+                aud.onended = () => {
+                    current++;
+                    setTimeout(playNext, 600);
+                };
+            }
+            playNext();
+        }
+    </script>
+</body>
+</html>
