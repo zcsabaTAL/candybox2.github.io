@@ -33,6 +33,8 @@ npm run build:prod
 
 Both build commands regenerate the legacy ASCII and text TypeScript sources, then compile the same legacy game. Their only intentional difference at this stage is the generated `BuildConfig.environment` value. Every CB3 feature flag remains disabled in both profiles.
 
+The canonical build mirrors the legacy arena source boundary exactly: TypeScript files one directory below `code/arena`, equivalent to `code/arena/*/*.ts`. Deeper nested files are not included implicitly.
+
 ## Safety invariants
 
 - Legacy `Game`, `Saving`, navigation, candy, inventory, quest, and encounter behavior remain authoritative.
@@ -71,6 +73,10 @@ Verified on 2026-09-12:
 - six production-profile smoke tests passed.
 
 Declarative legacy fixture definitions live in `tests/fixtures/legacy-save-fixtures.js`. The test helper materializes a complete slot through the legacy `LocalSaving` registry, so fixtures contain every currently registered legacy key and no CB3 payload.
+
+## Continuous integration
+
+`.github/workflows/test.yml` runs the complete development and production smoke suite for every pull request and on manual dispatch. The master deployment workflow runs the same test job first, and the Pages build cannot begin unless it passes. Both workflows install the Node version from `.nvmrc`, restore the npm cache, install the locked dependencies with `npm ci`, and install Playwright Chromium with its Linux dependencies.
 
 ## Preserved Drive changes
 

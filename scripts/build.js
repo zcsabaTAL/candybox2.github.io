@@ -18,7 +18,7 @@ var sourceFiles = [];
 appendTypeScriptFiles(sourceFiles, path.join(repositoryRoot, "libs"), false);
 appendTypeScriptFiles(sourceFiles, path.join(repositoryRoot, "code", "main"), false);
 appendTypeScriptFiles(sourceFiles, path.join(repositoryRoot, "code", "gen"), false);
-appendTypeScriptFiles(sourceFiles, path.join(repositoryRoot, "code", "arena"), true);
+appendArenaTypeScriptFiles(sourceFiles, path.join(repositoryRoot, "code", "arena"));
 
 var temporaryBundle = path.join(repositoryRoot, "candybox2_uncompressed.js.temp");
 var compiler = path.join(repositoryRoot, "node_modules", ".bin", "tsc");
@@ -49,6 +49,19 @@ function appendTypeScriptFiles(target, directory, recursive) {
             appendTypeScriptFiles(target, filePath, true);
         } else if (stat.isFile() && path.extname(fileName) === ".ts") {
             target.push(filePath);
+        }
+    });
+}
+
+function appendArenaTypeScriptFiles(target, arenaDirectory) {
+    if (!fs.existsSync(arenaDirectory)) {
+        fail("Missing source directory: " + arenaDirectory);
+    }
+
+    fs.readdirSync(arenaDirectory).sort().forEach(function(fileName) {
+        var filePath = path.join(arenaDirectory, fileName);
+        if (fs.statSync(filePath).isDirectory()) {
+            appendTypeScriptFiles(target, filePath, false);
         }
     });
 }
