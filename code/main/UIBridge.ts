@@ -129,6 +129,7 @@ class UIBridge {
                     case "Cauldron":
                         subtitle = "&laquo; <span class=\"highlight\">MAGIC</span> &raquo;";
                         title = "THE CAULDRON";
+                        flavor = "&ldquo;The sweet, heavy scent of bubbling syrups and secret brews fills the air.&rdquo;";
                         break;
                     case "Village":
                         title = "VILLAGE";

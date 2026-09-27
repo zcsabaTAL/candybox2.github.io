@@ -23,6 +23,23 @@ class FifthHouse extends House{
         // And then the player goes to its inventory, equip a weapon and then goes back to the fifth house
         // Here the fifth house must be updated so that the npc know that the player now has a weapon
         this.update();
+        if (typeof VoiceBridge !== "undefined") {
+            if (Saving.loadBool("cellarDone") == false) {
+                if (this.getGame().getSelectedEqItems()["weapon"] != null) {
+                    VoiceBridge.playFifthHouseEvent("mapVillageFifthHouseWeaponSpeech");
+                } else {
+                    VoiceBridge.playFifthHouseEvent("mapVillageFifthHouseNoWeaponSpeech");
+                }
+            } else {
+                VoiceBridge.playFifthHouseEvent("mapVillageFifthHouseCellarDone");
+            }
+        }
+    }
+    
+    public willStopBeingDisplayed(): void{
+        if (typeof VoiceBridge !== "undefined") {
+            VoiceBridge.stop();
+        }
     }
     
     // Private methods

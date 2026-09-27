@@ -46,6 +46,21 @@ class VoiceBridge {
         VoiceBridge.playSingle(merchantFile, "SecondHouse");
     }
 
+    public static playFifthHouseEvent(speechId: string): void {
+        var fifthHouseFile: string = "audio/voice/fifth_house/" + speechId + ".wav";
+        VoiceBridge.playSingle(fifthHouseFile, "FifthHouse");
+    }
+
+    public static playSquirrelEvent(speechId: string): void {
+        var squirrelFile: string = "audio/voice/squirrel/" + speechId + ".wav";
+        VoiceBridge.playSingle(squirrelFile, "ATree");
+    }
+
+    public static playTalkingCandyEvent(speechId: string): void {
+        var candyFile: string = "audio/voice/talking_candy/" + speechId + ".wav";
+        VoiceBridge.playSingle(candyFile, "CandyBox");
+    }
+
     public static playDialogue(playerTrack: string, responderTrack: string, placeName: string = null): void {
         VoiceBridge.stop();
         VoiceBridge.currentAudioPlace = placeName;

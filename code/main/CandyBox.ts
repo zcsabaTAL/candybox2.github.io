@@ -34,6 +34,21 @@ class CandyBox extends Place{
         // We add hotkeys
         this.getGame().addHotkey(new Hotkey("e", new CallbackCollection(this.clickedEatCandiesButton.bind(this))));
         this.getGame().addHotkey(new Hotkey("t", new CallbackCollection(this.clickedThrowCandiesButton.bind(this))));
+        
+        // Talking Candy speech
+        if (typeof VoiceBridge !== "undefined" && Saving.loadBool("gridItemPossessedTalkingCandy") == true) {
+            if (Saving.loadBool("lonelyHouseTakeTheBoxDone") == false) {
+                VoiceBridge.playTalkingCandyEvent("talkingCandySpeechNoBox");
+            } else if (Saving.loadBool("candyBoxBoxOpened") == false) {
+                VoiceBridge.playTalkingCandyEvent("talkingCandySpeech1");
+            }
+        }
+    }
+    
+    public willStopBeingDisplayed(): void{
+        if (typeof VoiceBridge !== "undefined") {
+            VoiceBridge.stop();
+        }
     }
     
     // Public methods
@@ -202,6 +217,10 @@ class CandyBox extends Place{
         Saving.saveBool("statusBarUnlockedTheComputer", true);
         Saving.saveBool("statusBarUnlockedTheArena", true);
         this.getGame().updateStatusBar(true);
+        
+        if (typeof VoiceBridge !== "undefined") {
+            VoiceBridge.playTalkingCandyEvent("talkingCandySpeech2");
+        }
         
         // Update
         this.update();

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <title>Candy Box 2 - 5. Ház Lakója Dialógus Lejátszó</title>
+</head>
+<body style="font-family:-apple-system,BlinkMacSystemFont,sans-serif; background:#121318; color:#e0e2eb; max-width:850px; margin:0 auto; padding:30px 20px;">
+    <h1 style="color:#ffb4a2; border-bottom:2px solid #3d2620; padding-bottom:10px;">Candy Box 2 – 5. Ház Lakója (Cellar Quest) Végleges Hangok</h1>
+    <div style="background:#1c1d24; border-left:4px solid #ff7b54; padding:14px 20px; margin:20px 0 25px;">
+        <strong>Modell & Karakter:</strong> Gemini 2.5 Pro TTS, Kore hang, autentikus Geordie akcentus.<br>
+        <strong>Helyszín:</strong> Falu, 5. Ház (Cellar / Patkányirtás küldetés).<br>
+        <strong>Konzisztencia:</strong> Mind a 3 szöveg azonos modellel, egy menetben generálva.
+    </div>
+    
+    <div style="margin-bottom:25px;">
+        <button id="playAllBtn" onclick="playAllSequentially()" style="background:#ff7b54; color:#121318; border:none; padding:12px 24px; font-weight:bold; font-size:1rem; border-radius:6px; cursor:pointer;">
+            ▶ Összes lejátszása sorban
+        </button>
+    </div>
+
+    
+        <div style="background:#1a1b23; border:1px solid #2e303e; border-radius:8px; padding:20px; margin-bottom:20px;">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+                <span style="background:#ff7b54; color:#121318; font-weight:bold; font-size:0.8rem; padding:4px 8px; border-radius:4px;">SOR 1</span>
+                <h2 style="margin:0; font-size:1.15rem; color:#fff;">mapVillageFifthHouseNoWeaponSpeech</h2>
+            </div>
+            <p style="color:#ffd166; font-size:1.05rem; margin-bottom:12px; font-style:italic;">\"Hello. My cellar is full of rats, I need to get rid of them... if only someone with a weapon could help me...\"</p>
+            <audio id="audio-1" controls preload="auto" style="width:100%;" src="mapVillageFifthHouseNoWeaponSpeech.wav"></audio>
+            <div style="margin-top:10px;"><a style="color:#64b5f6; font-size:0.85rem;" href="file:///Users/zoltancsaba/Library/CloudStorage/GoogleDrive-csaba.zoltan.laszlo@gmail.com/My Drive/Euroleasing/candybox2/audio/voice/fifth_house/mapVillageFifthHouseNoWeaponSpeech.wav" target="_blank">WAV közvetlen megnyitása</a></div>
+        </div>
+        
+        <div style="background:#1a1b23; border:1px solid #2e303e; border-radius:8px; padding:20px; margin-bottom:20px;">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+                <span style="background:#ff7b54; color:#121318; font-weight:bold; font-size:0.8rem; padding:4px 8px; border-radius:4px;">SOR 2</span>
+                <h2 style="margin:0; font-size:1.15rem; color:#fff;">mapVillageFifthHouseWeaponSpeech</h2>
+            </div>
+            <p style="color:#ffd166; font-size:1.05rem; margin-bottom:12px; font-style:italic;">\"Hey, you! I see you carry a weapon! If you kill the rats pestering my cellar, I'll reward you!\"</p>
+            <audio id="audio-2" controls preload="auto" style="width:100%;" src="mapVillageFifthHouseWeaponSpeech.wav"></audio>
+            <div style="margin-top:10px;"><a style="color:#64b5f6; font-size:0.85rem;" href="file:///Users/zoltancsaba/Library/CloudStorage/GoogleDrive-csaba.zoltan.laszlo@gmail.com/My Drive/Euroleasing/candybox2/audio/voice/fifth_house/mapVillageFifthHouseWeaponSpeech.wav" target="_blank">WAV közvetlen megnyitása</a></div>
+        </div>
+        
+        <div style="background:#1a1b23; border:1px solid #2e303e; border-radius:8px; padding:20px; margin-bottom:20px;">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+                <span style="background:#ff7b54; color:#121318; font-weight:bold; font-size:0.8rem; padding:4px 8px; border-radius:4px;">SOR 3</span>
+                <h2 style="margin:0; font-size:1.15rem; color:#fff;">mapVillageFifthHouseCellarDone</h2>
+            </div>
+            <p style="color:#ffd166; font-size:1.05rem; margin-bottom:12px; font-style:italic;">\"Thank you for getting rid of them! Here's something very precious as a reward : a map of the world. I think you will use it more than I do.\"</p>
+            <audio id="audio-3" controls preload="auto" style="width:100%;" src="mapVillageFifthHouseCellarDone.wav"></audio>
+            <div style="margin-top:10px;"><a style="color:#64b5f6; font-size:0.85rem;" href="file:///Users/zoltancsaba/Library/CloudStorage/GoogleDrive-csaba.zoltan.laszlo@gmail.com/My Drive/Euroleasing/candybox2/audio/voice/fifth_house/mapVillageFifthHouseCellarDone.wav" target="_blank">WAV közvetlen megnyitása</a></div>
+        </div>
+        
+
+    <script>
+    function playAllSequentially() {
+        const audios = [
+            document.getElementById('audio-1'),
+            document.getElementById('audio-2'),
+            document.getElementById('audio-3')
+        ];
+        let current = 0;
+        function playNext() {
+            if (current < audios.length) {
+                audios[current].scrollIntoView({behavior: 'smooth', block: 'center'});
+                audios[current].play();
+                audios[current].onended = () => {
+                    current++;
+                    setTimeout(playNext, 600);
+                };
+            }
+        }
+        audios.forEach(a => { a.pause(); a.currentTime = 0; });
+        playNext();
+    }
+    </script>
+</body>
+</html>

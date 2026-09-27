@@ -34,7 +34,43 @@ class ATree extends Place{
         return this.renderArea;
     }
     
+    // Public methods
+    public willBeDisplayed(): void{
+        if (typeof VoiceBridge !== "undefined") {
+            this.playCurrentSpeech();
+        }
+    }
+    
+    public willStopBeingDisplayed(): void{
+        if (typeof VoiceBridge !== "undefined") {
+            VoiceBridge.stop();
+        }
+    }
+    
     // Private methods
+    private playCurrentSpeech(): void {
+        if (typeof VoiceBridge === "undefined") return;
+        switch(Saving.loadNumber("aTreeStep")){
+            case 0: VoiceBridge.playSquirrelEvent("mapATreeIntroductionSpeech"); break;
+            case 1: VoiceBridge.playSquirrelEvent("mapATreeFirstQuestion"); break;
+            case 2: VoiceBridge.playSquirrelEvent("mapATreeSecondQuestion"); break;
+            case 3: VoiceBridge.playSquirrelEvent("mapATreeThirdQuestion"); break;
+            case 4: VoiceBridge.playSquirrelEvent("mapATreeFourthQuestion"); break;
+            case 5: VoiceBridge.playSquirrelEvent("mapATreeFifthQuestion"); break;
+            case 6: VoiceBridge.playSquirrelEvent("mapATreeTicTacToeIntro"); break;
+            case 7:
+                if (this.ticTacToeStep == ATreeTicTacToeStep.PLAYING) {
+                    VoiceBridge.playSquirrelEvent("mapATreeTicTacToeLetsPlay");
+                } else if (this.ticTacToeStep == ATreeTicTacToeStep.NOBODY_WINS) {
+                    VoiceBridge.playSquirrelEvent("mapATreeTicTacToeNobodyWins");
+                } else if (this.ticTacToeStep == ATreeTicTacToeStep.YOU_LOSE) {
+                    VoiceBridge.playSquirrelEvent("mapATreeTicTacToeYouLose");
+                }
+                break;
+            case 8: VoiceBridge.playSquirrelEvent("mapATreeTicTacToeYouWin"); break;
+            case 9: VoiceBridge.playSquirrelEvent("mapATreeNoMoreChallenge"); break;
+        }
+    }
     private addEnigma(enigmaAnswer: EnigmaAnswer, callbackCollection: CallbackCollection, otherClass: string, wrongClass: string = "", wrongMessage: string = "Wrong"): void{
         this.renderArea.addEnigma(21, 41, 24, enigmaAnswer, callbackCollection, otherClass, wrongClass, wrongMessage);
     }
@@ -95,6 +131,10 @@ class ATree extends Place{
         }
         if(Saving.loadNumber("aTreeStep") == 9){ // If we won the tic tac toe game
             this.getGame().gainItem("gridItemPossessedThirdHouseKey");
+        }
+        
+        if (typeof VoiceBridge !== "undefined") {
+            this.playCurrentSpeech();
         }
         
         // We update
@@ -343,6 +383,9 @@ class ATree extends Place{
     
     private playTicTacToe_tryAgain(): void{
         this.startTicTacToe();
+        if (typeof VoiceBridge !== "undefined") {
+            VoiceBridge.playSquirrelEvent("mapATreeTicTacToeLetsPlay");
+        }
         this.update();
         this.getGame().updatePlace();
     }
@@ -358,6 +401,15 @@ class ATree extends Place{
             this.ticTacToeBoard[bestPosition.x][bestPosition.y] = ATreeTicTacToeSign.O;
             // Test end game conditions
             this.playTicTacToe_testEndGameConditions();
+        }
+        
+        // If the game ended with lose or draw, trigger the appropriate voice line
+        if (typeof VoiceBridge !== "undefined") {
+            if (this.ticTacToeStep == ATreeTicTacToeStep.YOU_LOSE) {
+                VoiceBridge.playSquirrelEvent("mapATreeTicTacToeYouLose");
+            } else if (this.ticTacToeStep == ATreeTicTacToeStep.NOBODY_WINS) {
+                VoiceBridge.playSquirrelEvent("mapATreeTicTacToeNobodyWins");
+            }
         }
         
         // Update

@@ -23,9 +23,8 @@ class MusicBridge {
         "Village": "music/places/village.mp3",
         "Forge": "music/places/forge.mp3",
         "SorceressHut": "music/places/sorceressHut.mp3",
-        // The Cauldron is the witch's own workspace (reached from her hut), so it shares her
-        // theme rather than getting a separate track.
-        "Cauldron": "music/places/sorceressHut.mp3",
+        // The Cauldron (alchemy and potion brewing)
+        "Cauldron": "music/places/cauldron.mp3",
         "Lighthouse": "music/places/lighthouse.mp3",
         "Desert": "music/places/desert.mp3",
         // The Pier itself and jumping into the water off it (TheSea) share one theme, since
